@@ -1,0 +1,88 @@
+---
+title: "Next.js Deep Dive: Understanding the Framework"
+date: "2024-05-10"
+summary: "Going deeper into Next.js, exploring static generation, server components, and more advanced features."
+tags: ["nextjs", "react", "static-generation"]
+projectId: "playground"
+slug: "nextjs-deep-dive"
+---
+
+# Next.js Deep Dive: Understanding the Framework
+
+After building my portfolio with Next.js, I wanted to understand the framework better. What makes it special? How does it work under the hood?
+
+## Static Generation vs Server-Side Rendering
+
+One of the first things I learned was the difference between static generation and server-side rendering:
+
+- **Static Generation**: Pages are built at build time
+- **Server-Side Rendering**: Pages are generated on each request
+
+For my blog, static generation made perfect sense. All the content is known at build time, so why generate it on every request?
+
+## The App Router
+
+Next.js 13+ introduced the App Router, which changed how I structure my projects:
+
+```
+app/
+  layout.tsx
+  page.tsx
+  [slug]/
+    page.tsx
+```
+
+This file-based routing is intuitive and powerful.
+
+## Server Components
+
+Server Components were a game-changer. Being able to fetch data directly in components without client-side JavaScript was revolutionary:
+
+```typescript
+// This runs on the server
+export default async function Page() {
+  const data = await fetch('...');
+  return <div>{data}</div>;
+}
+```
+
+## Image Optimization
+
+Next.js Image component handles optimization automatically:
+
+```typescript
+import Image from 'next/image';
+
+<Image
+  src="/photo.jpg"
+  alt="Description"
+  width={800}
+  height={600}
+/>
+```
+
+This was a huge performance win.
+
+## Metadata API
+
+The new Metadata API makes SEO much easier:
+
+```typescript
+export const metadata = {
+  title: 'My Page',
+  description: 'Page description',
+};
+```
+
+## What I Learned
+
+1. **Static generation is powerful**: For content sites, it's often the best choice
+2. **File-based routing is intuitive**: It makes project structure clear
+3. **Performance matters**: Next.js optimizations make a real difference
+
+## Moving Forward
+
+Understanding Next.js deeply has made me a better developer. I can make informed decisions about when to use static generation, when to use SSR, and how to structure my projects for maximum performance and developer experience.
+
+This framework has become my go-to for building web applications, and I'm excited to continue exploring its capabilities.
+
