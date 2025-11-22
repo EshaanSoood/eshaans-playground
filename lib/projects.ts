@@ -7,7 +7,7 @@ export interface ProjectConfig {
 export const projects: Record<string, ProjectConfig> = {
   playground: {
     name: 'Eshaan\'s Playground',
-    description: 'My journey learning web development and building projects.',
+    description: 'These are a few of the projects I have made so far as well as the projects under way.',
     color: 'project-blue',
   },
   'portfolio-site': {

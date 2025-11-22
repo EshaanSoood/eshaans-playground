@@ -36,7 +36,7 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
-      aria-label="Toggle dark mode"
+      aria-label="Turn The Lights Off"
     >
       {isDark ? (
         <svg

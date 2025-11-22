@@ -116,7 +116,7 @@ export default function PostPage({ params }: PostPageProps) {
           </h3>
           <p className="text-gray-700 dark:text-gray-300">
             Eshaan Sood is a web developer and accessibility consultant passionate about
-            creating thoughtful, accessible web experiences.
+            creating thoughtful, accessible web experiences. An artist at heart and practice Eshaan truly loves making things and solving problems.
           </p>
         </div>
 

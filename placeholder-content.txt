@@ -1,0 +1,430 @@
+================================
+app/layout.tsx
+(Root layout metadata)
+========================================================
+
+Eshaan's Playground
+
+A blog showcasing non-music dev projects and the process behind them.
+
+---
+
+================================
+app/page.tsx
+(Home page)
+========================================================
+
+Welcome to Eshaan's Playground
+
+Hi, I'm Eshaan. This blog showcases my non-music dev projects and the process behind them. It's a narrative journey from asking a friend to build my site to shipping my own Next.js projects in ~9 months.
+
+I write about accessibility, thoughtful UX, and the technical decisions that shape the projects I build. Whether you're a developer, hiring manager, or someone interested in accessible web experiences, I hope you find something valuable here.
+
+Latest Posts
+
+View all →
+
+No posts yet. Check back soon!
+
+Timeline
+
+Projects
+
+Main site
+
+---
+
+================================
+app/timeline/page.tsx
+(Timeline page)
+========================================================
+
+Timeline
+
+All posts in chronological order
+
+No posts yet. Check back soon!
+
+---
+
+================================
+app/projects/page.tsx
+(Projects page)
+========================================================
+
+Projects
+
+Posts grouped by project
+
+No projects yet. Check back soon!
+
+---
+
+================================
+app/[slug]/page.tsx
+(Individual post page)
+========================================================
+
+About the Author
+
+Eshaan Sood is a web developer and accessibility consultant passionate about creating thoughtful, accessible web experiences.
+
+View Repository
+
+Live Demo
+
+Share this post
+
+Share on Facebook
+
+Share on LinkedIn
+
+Copy link
+
+← Back to timeline
+
+---
+
+================================
+app/not-found.tsx
+(404 error page)
+========================================================
+
+404 - Page Not Found
+
+The page you're looking for doesn't exist.
+
+Return home
+
+---
+
+================================
+components/Header.tsx
+(Header navigation)
+========================================================
+
+Eshaan's Playground
+
+Timeline
+
+Projects
+
+Main site
+
+Contact
+
+---
+
+================================
+components/Footer.tsx
+(Footer)
+========================================================
+
+© Eshaan Sood
+
+---
+
+================================
+components/ThemeToggle.tsx
+(Theme toggle button)
+========================================================
+
+Toggle dark mode
+
+---
+
+================================
+components/CopyLinkButton.tsx
+(Copy link button)
+========================================================
+
+Copy link
+
+---
+
+================================
+lib/projects.ts
+(Project configuration - visible names and descriptions)
+========================================================
+
+Eshaan's Playground
+
+My journey learning web development and building projects.
+
+Portfolio Site
+
+Building my personal portfolio website from scratch.
+
+First Project
+
+My very first web development project.
+
+Accessibility Project
+
+Exploring accessibility best practices in web development.
+
+---
+
+================================
+posts/first-steps.mdx
+(Post: First Steps)
+========================================================
+
+First Steps: Asking a Friend to Build My Site
+
+The beginning of my web development journey, starting with asking a friend for help.
+
+It all started with a simple request: "Can you help me build a website?" I had no idea what I was getting into, but I knew I wanted something online that represented me and my work.
+
+The Request
+
+I reached out to a friend who was already working as a web developer. At the time, I thought building a website was something you just... did. I didn't realize the complexity, the decisions, the trade-offs involved.
+
+Looking back, I'm grateful for that initial help. It opened my eyes to what was possible, but it also made me realize I wanted to understand how it all worked.
+
+The Realization
+
+After seeing the site come together, I started asking questions:
+
+- How does this work?
+- Why did you choose this approach?
+- Can I change this myself?
+
+Those questions led me down a path I never expected to take. Within a few months, I was learning HTML, CSS, and JavaScript on my own.
+
+What I Learned
+
+The most important lesson from this experience wasn't technical—it was about curiosity. Once I started asking "how" and "why," I couldn't stop. That curiosity is what drives me today.
+
+Next Steps
+
+This was just the beginning. In the next post, I'll share how I went from asking for help to building my first project independently.
+
+---
+
+================================
+posts/learning-html-css.mdx
+(Post: Learning HTML and CSS)
+========================================================
+
+Learning HTML and CSS: The Foundation
+
+My journey learning the fundamentals of web development, starting with HTML and CSS.
+
+After seeing my friend build my first site, I was hooked. I needed to understand how it all worked. So I started with the basics: HTML and CSS.
+
+Starting from Scratch
+
+I began with free online resources—tutorials, documentation, and lots of experimentation. The first time I wrote HTML and saw it render in a browser, I was amazed. It felt like magic.
+
+The Struggles
+
+Learning wasn't always smooth:
+
+1. Semantic HTML: Understanding when to use <div> vs <section> vs <article>
+2. CSS Layout: Flexbox and Grid seemed impossible at first
+3. Responsive Design: Making things work on mobile felt like solving a puzzle
+
+But each struggle taught me something valuable.
+
+Breakthrough Moments
+
+There were moments when things clicked:
+
+- Understanding the box model
+- Getting Flexbox to work for the first time
+- Creating a responsive layout that actually worked
+
+These small wins kept me going.
+
+Code Example
+
+Here's a simple example of what I was learning:
+
+Moving Forward
+
+HTML and CSS gave me the foundation I needed. Next, I wanted to make things interactive. That's when JavaScript entered the picture.
+
+---
+
+================================
+posts/building-portfolio.mdx
+(Post: Building Portfolio)
+========================================================
+
+Building My Portfolio Site: A Real Project
+
+Taking everything I learned and applying it to build my own portfolio website from scratch.
+
+After months of learning, I was ready to build something real. I decided to rebuild my portfolio site from scratch, using everything I'd learned so far.
+
+The Decision
+
+I chose to use Next.js for this project. It felt like the right balance of structure and flexibility. Plus, I wanted to learn React, and Next.js seemed like a great way to do that.
+
+Planning the Project
+
+Before writing any code, I spent time planning:
+
+- What pages do I need?
+- How should the navigation work?
+- What's the content structure?
+
+This planning phase saved me a lot of time later.
+
+Building the Foundation
+
+I started with the basics:
+
+1. Setting up the Next.js project
+2. Creating the layout structure
+3. Building reusable components
+
+Each step built on the previous one.
+
+Challenges and Solutions
+
+Challenge: Responsive Navigation
+
+Creating a mobile-friendly navigation menu was trickier than I expected. I ended up using a combination of CSS Grid and Flexbox to make it work.
+
+Challenge: Performance
+
+I wanted the site to be fast. This led me to learn about:
+- Image optimization
+- Code splitting
+- Static generation
+
+The Result
+
+After weeks of work, I had a portfolio site I was proud of. More importantly, I had learned so much in the process.
+
+Key Takeaways
+
+1. Planning matters: Time spent planning saves time coding
+2. Start simple: Build the basics first, then add complexity
+3. Learn by doing: Building real projects teaches you more than tutorials
+
+This project was a turning point. It showed me I could build something real, something I could be proud of.
+
+---
+
+================================
+posts/accessibility-first.mdx
+(Post: Accessibility First)
+========================================================
+
+Accessibility First: Building Inclusive Web Experiences
+
+Discovering the importance of accessibility and making it a core part of my development process.
+
+As I continued building projects, I started learning about accessibility. It changed how I think about web development completely.
+
+The Wake-Up Call
+
+I was building a form when someone asked me: "Can someone using a screen reader fill this out?" I had no idea. That question sent me down a rabbit hole that changed everything.
+
+Learning the Basics
+
+I started with the fundamentals:
+
+- Semantic HTML: Using the right elements for the right purpose
+- ARIA attributes: When and how to use them
+- Keyboard navigation: Ensuring everything works without a mouse
+- Color contrast: Making sure text is readable
+
+Real-World Impact
+
+Learning about accessibility made me realize:
+
+The web should be accessible to everyone, regardless of their abilities.
+
+This isn't just a nice-to-have—it's essential.
+
+Practical Examples
+
+Semantic HTML
+
+ARIA Labels
+
+Keyboard Navigation
+
+Tools and Resources
+
+I discovered amazing tools:
+
+- axe DevTools: Browser extension for accessibility testing
+- WAVE: Web accessibility evaluation tool
+- Screen readers: Testing with NVDA and VoiceOver
+
+Making It a Habit
+
+Now, accessibility is part of my process from the start:
+
+1. Use semantic HTML
+2. Test with keyboard navigation
+3. Check color contrast
+4. Test with screen readers
+
+The Impact
+
+Building accessible sites isn't just the right thing to do—it makes sites better for everyone. Better structure, clearer navigation, more robust code.
+
+This focus on accessibility has become central to how I work, and it's something I'm passionate about sharing with others.
+
+---
+
+================================
+posts/nextjs-deep-dive.mdx
+(Post: Next.js Deep Dive)
+========================================================
+
+Next.js Deep Dive: Understanding the Framework
+
+Going deeper into Next.js, exploring static generation, server components, and more advanced features.
+
+After building my portfolio with Next.js, I wanted to understand the framework better. What makes it special? How does it work under the hood?
+
+Static Generation vs Server-Side Rendering
+
+One of the first things I learned was the difference between static generation and server-side rendering:
+
+- Static Generation: Pages are built at build time
+- Server-Side Rendering: Pages are generated on each request
+
+For my blog, static generation made perfect sense. All the content is known at build time, so why generate it on every request?
+
+The App Router
+
+Next.js 13+ introduced the App Router, which changed how I structure my projects:
+
+This file-based routing is intuitive and powerful.
+
+Server Components
+
+Server Components were a game-changer. Being able to fetch data directly in components without client-side JavaScript was revolutionary:
+
+Image Optimization
+
+Next.js Image component handles optimization automatically:
+
+This was a huge performance win.
+
+Metadata API
+
+The new Metadata API makes SEO much easier:
+
+What I Learned
+
+1. Static generation is powerful: For content sites, it's often the best choice
+2. File-based routing is intuitive: It makes project structure clear
+3. Performance matters: Next.js optimizations make a real difference
+
+Moving Forward
+
+Understanding Next.js deeply has made me a better developer. I can make informed decisions about when to use static generation, when to use SSR, and how to structure my projects for maximum performance and developer experience.
+
+This framework has become my go-to for building web applications, and I'm excited to continue exploring its capabilities.
+
+---
+

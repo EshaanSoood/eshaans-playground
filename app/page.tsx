@@ -13,14 +13,13 @@ export default function HomePage() {
           Welcome to Eshaan&apos;s Playground
         </h1>
         <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-          Hi, I&apos;m Eshaan. This blog showcases my non-music dev projects and the process
-          behind them. It&apos;s a narrative journey from asking a friend to build my site to
-          shipping my own Next.js projects in ~9 months.
+          Hey, my name is Eshaan Sood. I&apos;m a musician who also happens to be blind. in February 2025 I a few months before I was about to graduate from college, I asked a friend to help me build a website. I was a design student before I went blind and in a parallel universe, I would have just built my website myself. I had some very kind friends who didn&apos;t charge me their normal rate and helped me out. However as time went on my ideas of what I wanted grew more and more.
         </p>
         <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-          I write about accessibility, thoughtful UX, and the technical decisions that shape
-          the projects I build. Whether you&apos;re a developer, hiring manager, or someone
-          interested in accessible web experiences, I hope you find something valuable here.
+          I also wanted to build accessible web experiences for my music projects. With a dep love of systems design and user experience and absolutely no coding knowledge what so ever, I decided to dip my toes into the dreaded pool of using AI to code. Through the three projects I have made so far, I went from asking someone to build me a basic website to building and shipping an interactive Next JS app.
+        </p>
+        <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+          This blog outlines my journey of jumping back into the design world with accessibility first principles. So whether you are a developer, a fellow nerd or just someone curious I hope you find some interesting things along this story.
         </p>
       </section>
 

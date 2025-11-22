@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata = {
   title: "Eshaan's Playground",
-  description: 'A blog showcasing non-music dev projects and the process behind them.',
+  description: 'How a nerdy blind musician went from hiring web developers to building his own react apps..',
 }
 
 export default function RootLayout({
