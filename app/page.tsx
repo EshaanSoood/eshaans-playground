@@ -13,7 +13,7 @@ export default function HomePage() {
           Welcome to Eshaan&apos;s Playground
         </h1>
         <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-          Hey, my name is Eshaan Sood. I&apos;m a musician who also happens to be blind. in February 2025 I a few months before I was about to graduate from college, I asked a friend to help me build a website. I was a design student before I went blind and in a parallel universe, I would have just built my website myself. I had some very kind friends who didn&apos;t charge me their normal rate and helped me out. However as time went on my ideas of what I wanted grew more and more.
+          Hey, my name is Eshaan Sood. I&apos;m a musician who also happens to be blind. in February 2025, a few months before I was about to graduate from college, I asked a friend to help me build a website. I was a design student before I went blind and in a parallel universe, I would have just built my website myself. I had some very kind friends who didn&apos;t charge me their normal rate and helped me out. However as time went on my ideas of what I wanted grew more and more.
         </p>
         <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
           I also wanted to build accessible web experiences for my music projects. With a dep love of systems design and user experience and absolutely no coding knowledge what so ever, I decided to dip my toes into the dreaded pool of using AI to code. Through the three projects I have made so far, I went from asking someone to build me a basic website to building and shipping an interactive Next JS app.
