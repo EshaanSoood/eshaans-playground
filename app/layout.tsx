@@ -1,7 +1,7 @@
-import { Inter } from 'next/font/google'
+import { Inter, Merriweather } from 'next/font/google'
+import '../styles/globals.css'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import '../styles/globals.css'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,9 +9,16 @@ const inter = Inter({
   display: 'swap',
 })
 
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  weight: ['300', '400', '700', '900'],
+  display: 'swap',
+})
+
 export const metadata = {
-  title: "Eshaan's Playground",
-  description: 'How a nerdy blind musician went from hiring web developers to building his own react apps..',
+  title: 'App',
+  description: '',
 }
 
 export default function RootLayout({
@@ -20,10 +27,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <html lang="en" className={`${inter.variable} ${merriweather.variable}`}>
+      <body>
         <Header />
-        <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <main className="px-4 py-8">
           {children}
         </main>
         <Footer />
