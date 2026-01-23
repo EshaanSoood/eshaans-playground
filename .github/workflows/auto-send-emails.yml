@@ -1,0 +1,38 @@
+name: Auto Send Emails
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'posts/**/*.mdx'
+      - 'newsletters/**/*.mdx'
+
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for better diff detection
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Send emails for new content
+        env:
+          CONVEX_URL: ${{ secrets.CONVEX_URL }}
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL }}
+          POSTMARK_SERVER_API_TOKEN: ${{ secrets.POSTMARK_SERVER_API_TOKEN }}
+          POSTMARK_FROM_EMAIL: ${{ secrets.POSTMARK_FROM_EMAIL || 'newsletter@dreamriver.eshaansood.in' }}
+          NEXT_PUBLIC_BLOG_URL: ${{ secrets.NEXT_PUBLIC_BLOG_URL || 'https://dreamriver.eshaansood.in' }}
+        run: npx tsx scripts/auto-send-emails.ts

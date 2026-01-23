@@ -11,4 +11,11 @@ export default defineSchema({
     slug: v.string(),
     content: v.string(),
   }).index("by_slug", ["slug"]).index("by_date", ["date"]),
+  subscribers: defineTable({
+    email: v.string(),
+    name: v.optional(v.string()),
+    subscribedAt: v.number(),
+    status: v.union(v.literal("active"), v.literal("unsubscribed")),
+    source: v.optional(v.string()),
+  }).index("by_email", ["email"]).index("by_status", ["status"]),
 });

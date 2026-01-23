@@ -9,6 +9,7 @@
  */
 
 import type * as posts from "../posts.js";
+import type * as subscribers from "../subscribers.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +19,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   posts: typeof posts;
+  subscribers: typeof subscribers;
 }>;
 
 /**
