@@ -7,7 +7,9 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import type { Metadata } from 'next'
 
 interface PostPageProps {
-  params: {
+  params: Promise<{
+    slug: string
+  }> | {
     slug: string
   }
 }
@@ -29,7 +31,10 @@ export const revalidate = 60 // Revalidate every 60 seconds
 // Posts are fetched at request time from Convex
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug)
+  // Handle Next.js 16 params which might be a Promise
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const post = await getPostBySlug(slug);
   
   if (!post) {
     return {
@@ -44,10 +49,15 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const post = await getPostBySlug(params.slug)
+  // Handle Next.js 16 params which might be a Promise
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  
+  const post = await getPostBySlug(slug);
 
   if (!post) {
-    notFound()
+    console.error(`Post not found for slug: ${slug}`);
+    notFound();
   }
 
   return (

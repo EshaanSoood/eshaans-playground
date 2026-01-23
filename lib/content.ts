@@ -49,13 +49,17 @@ export async function getAllPosts(): Promise<Post[]> {
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const convex = getConvexClient();
   if (!convex) {
+    console.warn(`Convex client not available for slug: ${slug}`);
     return null;
   }
   try {
     const post = await convex.query(api.posts.getPostBySlug, { slug });
+    if (!post) {
+      console.warn(`Post not found in Convex for slug: ${slug}`);
+    }
     return post as Post | null;
   } catch (error) {
-    console.warn("Failed to fetch post from Convex:", error);
+    console.error(`Failed to fetch post from Convex for slug "${slug}":`, error);
     return null;
   }
 }
