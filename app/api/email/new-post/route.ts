@@ -128,7 +128,20 @@ export async function POST(request: NextRequest) {
     console.log(`📧 Sending email campaign for post "${slug}" to ${subscribers.length} subscribers`);
     
     // Send emails to all subscribers
-    const result = await sendBlogPostToSubscribers(slug, convexUrl);
+    let result;
+    try {
+      result = await sendBlogPostToSubscribers(slug, convexUrl);
+    } catch (emailError) {
+      console.error(`❌ Error calling sendBlogPostToSubscribers:`, emailError);
+      return NextResponse.json(
+        {
+          error: "Failed to send emails",
+          message: emailError instanceof Error ? emailError.message : String(emailError),
+          slug,
+        },
+        { status: 500 }
+      );
+    }
     
     if (!result.success) {
       console.error(`❌ Failed to send emails for post "${slug}"`);
