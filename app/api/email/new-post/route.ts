@@ -58,13 +58,19 @@ export async function POST(request: NextRequest) {
     
     // Verify webhook secret
     const authHeader = request.headers.get("authorization");
-    const webhookSecret = process.env.WEBHOOK_SECRET;
+    const webhookSecret = process.env.WEBHOOK_SECRET?.trim();
     
     if (webhookSecret) {
-      const isValidAuth = authHeader === `Bearer ${webhookSecret}`;
-      const isValidBody = bodySecret === webhookSecret;
+      const providedSecret = authHeader?.replace(/^Bearer\s+/i, '').trim();
+      const isValidAuth = providedSecret === webhookSecret;
+      const isValidBody = bodySecret?.trim() === webhookSecret;
       
       if (!isValidAuth && !isValidBody) {
+        console.error("Webhook secret mismatch:", {
+          expectedLength: webhookSecret.length,
+          providedLength: providedSecret?.length || 0,
+          bodySecretLength: bodySecret?.trim()?.length || 0,
+        });
         return NextResponse.json(
           { error: "Unauthorized - invalid webhook secret" },
           { status: 401 }

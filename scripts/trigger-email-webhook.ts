@@ -10,10 +10,16 @@
  */
 
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 import { resolve } from 'path';
 
 // Load environment variables
 dotenv.config({ path: resolve(__dirname, '../.env.local') });
+// Also load from Vercel env if available
+const vercelEnvPath = resolve(__dirname, '../.env.vercel');
+if (fs.existsSync(vercelEnvPath)) {
+  dotenv.config({ path: vercelEnvPath });
+}
 
 async function main() {
   const args = process.argv.slice(2);
