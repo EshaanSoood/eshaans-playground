@@ -46,11 +46,12 @@ export async function POST(request: NextRequest) {
 
     // Verify webhook secret
     const authHeader = request.headers.get("authorization");
-    const webhookSecret = process.env.WEBHOOK_SECRET;
+    const webhookSecret = process.env.WEBHOOK_SECRET?.trim();
 
     if (webhookSecret) {
-      const isValidAuth = authHeader === `Bearer ${webhookSecret}`;
-      const isValidBody = bodySecret === webhookSecret;
+      const providedSecret = authHeader?.replace(/^Bearer\s+/i, '').trim();
+      const isValidAuth = providedSecret === webhookSecret;
+      const isValidBody = bodySecret?.trim() === webhookSecret;
 
       if (!isValidAuth && !isValidBody) {
         return NextResponse.json(
