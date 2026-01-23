@@ -93,7 +93,7 @@ async function migratePosts() {
       }
 
       // Insert post into Convex
-      await convex.mutation(api.posts.insertPost, {
+      const postId = await convex.mutation(api.posts.insertPost, {
         title: post.title,
         date: post.date,
         summary: post.summary,
@@ -104,6 +104,42 @@ async function migratePosts() {
       });
 
       console.log(`✅ Migrated "${post.title}" (${post.slug})`);
+
+      // Automatically trigger email webhook
+      const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL || 'https://blog.eshaansood.in';
+      const emailWebhookUrl = `${blogUrl}/api/email/new-post`;
+      const webhookSecret = process.env.WEBHOOK_SECRET;
+
+      console.log(`📧 Triggering email webhook...`);
+      
+      try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+
+        if (webhookSecret) {
+          headers['Authorization'] = `Bearer ${webhookSecret}`;
+        }
+
+        const emailResponse = await fetch(emailWebhookUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            slug: post.slug,
+            webhookSecret,
+          }),
+        });
+
+        const emailResult = await emailResponse.json();
+
+        if (emailResponse.ok) {
+          console.log(`   ✅ Email sent to ${emailResult.sentCount || 0} subscribers`);
+        } else {
+          console.warn(`   ⚠️  Email failed: ${emailResult.error || emailResult.message}`);
+        }
+      } catch (emailError) {
+        console.warn(`   ⚠️  Email webhook error:`, emailError instanceof Error ? emailError.message : String(emailError));
+      }
     } catch (error) {
       console.error(`❌ Failed to migrate "${post.title}":`, error);
     }
