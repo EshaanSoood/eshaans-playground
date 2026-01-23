@@ -66,11 +66,8 @@ export async function POST(request: NextRequest) {
       const isValidBody = bodySecret?.trim() === webhookSecret;
       
       if (!isValidAuth && !isValidBody) {
-        console.error("Webhook secret mismatch:", {
-          expectedLength: webhookSecret.length,
-          providedLength: providedSecret?.length || 0,
-          bodySecretLength: bodySecret?.trim()?.length || 0,
-        });
+        // Don't log secret values - only log that authentication failed
+        console.error("Webhook authentication failed - invalid secret provided");
         return NextResponse.json(
           { error: "Unauthorized - invalid webhook secret" },
           { status: 401 }
