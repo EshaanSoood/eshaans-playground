@@ -306,9 +306,14 @@ async function main() {
 
 main()
   .then(() => {
+    console.log("✅ Script completed successfully");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Failed:", error);
+    console.error("❌ Script failed:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     process.exit(1);
   });
