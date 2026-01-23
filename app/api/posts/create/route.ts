@@ -96,9 +96,20 @@ export async function POST(request: NextRequest) {
 
     // Automatically send email if requested
     if (sendEmail) {
-      const blogUrl = process.env.NEXT_PUBLIC_BLOG_URL || process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` 
-        : 'https://blog.eshaansood.in';
+      // Determine the correct base URL
+      let blogUrl = process.env.NEXT_PUBLIC_BLOG_URL;
+      
+      // If not set, try to construct from request
+      if (!blogUrl) {
+        const host = request.headers.get('host');
+        const protocol = request.headers.get('x-forwarded-proto') || 'https';
+        blogUrl = `${protocol}://${host}`;
+      }
+      
+      // Fallback to production URL
+      if (!blogUrl) {
+        blogUrl = 'https://blog.eshaansood.in';
+      }
       
       const emailWebhookUrl = `${blogUrl}/api/email/new-post`;
       

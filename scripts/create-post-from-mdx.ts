@@ -17,6 +17,12 @@ import { resolve } from 'path';
 
 // Load environment variables
 dotenv.config({ path: resolve(__dirname, '../.env.local') });
+// Also try to load from Vercel env if available
+try {
+  dotenv.config({ path: resolve(__dirname, '../.env.vercel') });
+} catch {
+  // Ignore if .env.vercel doesn't exist
+}
 
 async function main() {
   const args = process.argv.slice(2);
