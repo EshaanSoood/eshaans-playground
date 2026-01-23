@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${merriweather.variable}`}>
       <body>
         <Header />
-        <main className="px-4 py-8">
+        <main className="py-8">
           {children}
         </main>
         <Footer />

@@ -54,7 +54,7 @@
     font-family: var(--font-inter), system-ui, -apple-system,
       "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 14px;
-    line-height: 1.7;
+    line-height: 1.75;
     color: var(--text-main);
   }
 
@@ -68,8 +68,9 @@
     height: auto;
     vertical-align: middle;
     display: block;
-    margin: 1.5em auto;
+    margin: 2.5em auto;
     object-fit: contain;
+    border-radius: 2px;
   }
 
   /* Constrain images in article content to readable width */
@@ -98,9 +99,11 @@
   }
 
   h2 {
-    font-size: 32px;
-    line-height: 36px;
+    font-size: 28px;
+    line-height: 34px;
     margin-top: 20px;
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 
   h3 {
@@ -129,31 +132,40 @@
 
   p {
     margin-top: 0;
-    margin-bottom: 1.5em;
+    margin-bottom: 1.75em;
   }
 
   blockquote {
-    margin: 0 0 1.5em 0;
-    padding: 10px 20px;
-    border-left: 5px solid var(--border-soft);
-    font-size: 18px;
-    line-height: 1.7;
+    margin: 2em 0;
+    padding: 0;
+    border: none;
+    font-size: 20px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-weight: 300;
+    max-width: 85%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   a {
-    color: var(--link);
+    color: var(--text-secondary);
     text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-decoration-thickness: 0.5px;
+    text-decoration-color: var(--text-light);
+    text-underline-offset: 3px;
     background: transparent !important;
     border: none !important;
     outline: none;
     box-shadow: none !important;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
 
   a:hover {
-    color: var(--link-hover);
-    text-decoration-thickness: 2px;
+    color: var(--text-main);
+    text-decoration-color: var(--text-secondary);
+    text-decoration-thickness: 1px;
   }
 
   a:focus {
@@ -183,8 +195,12 @@
   }
 
   figcaption {
-    margin-top: 5px;
+    margin-top: 0.75em;
     text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+    font-style: italic;
+    line-height: 1.5;
   }
 
   ul,
@@ -258,4 +274,58 @@ article a {
   box-shadow: none !important;
   padding: 0 !important;
   display: inline;
+}
+
+/* Content column wrapper - constrain reading width */
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Header nav in same content column */
+header nav {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Reduce vertical space under header */
+header {
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 0;
+}
+
+header nav {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Quiet nav links */
+header nav a {
+  color: var(--text-light);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+header nav a:hover {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+/* Date styling - remove pill, make it metadata */
+time {
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 400;
+  margin-top: 0.25em;
+  display: block;
+}
+
+/* Softer image edges */
+article img,
+main img {
+  border-radius: 3px;
 }

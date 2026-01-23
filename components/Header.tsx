@@ -3,8 +3,8 @@ import { MAIN_SITE_URL } from '@/lib/links'
 
 export function Header() {
   return (
-    <header className="border-b border-gray-200">
-      <nav aria-label="Main navigation" className="px-4 py-4">
+    <header>
+      <nav aria-label="Main navigation">
         <ul className="flex gap-6">
           <li>
             <Link href="/">Home</Link>
