@@ -1,0 +1,14 @@
+import { defineSchema, defineTable } from "convex/server";
+import { v } from "convex/values";
+
+export default defineSchema({
+  posts: defineTable({
+    title: v.string(),
+    date: v.string(),
+    summary: v.string(),
+    tags: v.array(v.string()),
+    projectId: v.string(),
+    slug: v.string(),
+    content: v.string(),
+  }).index("by_slug", ["slug"]).index("by_date", ["date"]),
+});

@@ -4,6 +4,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import type { Metadata } from 'next'
 
 interface PostPageProps {
   params: {
@@ -21,14 +22,39 @@ function formatDate(dateString: string): string {
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
+  try {
+    const posts = await getAllPosts()
+    // Return empty array if no posts - Next.js will handle this gracefully
+    if (!posts || posts.length === 0) {
+      return []
+    }
+    return posts.map((post) => ({
+      slug: post.slug,
+    }))
+  } catch (error) {
+    console.warn("Failed to generate static params:", error)
+    // Return empty array to allow build to succeed
+    return []
+  }
 }
 
-export default function PostPage({ params }: PostPageProps) {
-  const post = getPostBySlug(params.slug)
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug)
+  
+  if (!post) {
+    return {
+      title: "Eshaan's Playground.",
+    }
+  }
+  
+  return {
+    title: `${post.title} | Eshaan's Playground.`,
+    description: post.summary || post.content.slice(0, 160).replace(/\n/g, ' ').trim() + '...',
+  }
+}
+
+export default async function PostPage({ params }: PostPageProps) {
+  const post = await getPostBySlug(params.slug)
 
   if (!post) {
     notFound()

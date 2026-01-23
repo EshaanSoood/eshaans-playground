@@ -1,8 +1,5 @@
-import fs from 'fs'
-import path from 'path'
-import matter from 'gray-matter'
-
-const postsDirectory = path.join(process.cwd(), 'posts')
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../convex/_generated/api";
 
 export interface Post {
   title: string
@@ -14,56 +11,67 @@ export interface Post {
   content: string
 }
 
-function getPostSlugs(): string[] {
-  if (!fs.existsSync(postsDirectory)) {
-    return []
+// Initialize Convex client lazily with fallback
+function getConvexClient(): ConvexHttpClient | null {
+  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+  if (!convexUrl) {
+    // Return null if CONVEX_URL is not set - allows build to succeed
+    // Posts will be empty until Convex is configured
+    return null;
   }
-  return fs.readdirSync(postsDirectory).filter((file) => file.endsWith('.mdx'))
+  return new ConvexHttpClient(convexUrl);
 }
 
-function getPostBySlugFile(slug: string): Post | null {
-  const fullPath = path.join(postsDirectory, `${slug}.mdx`)
-  if (!fs.existsSync(fullPath)) {
-    return null
+export async function getAllPosts(): Promise<Post[]> {
+  const convex = getConvexClient();
+  if (!convex) {
+    // Return empty array if Convex is not configured
+    return [];
   }
-
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { data, content } = matter(fileContents)
-
-  return {
-    title: data.title || '',
-    date: data.date || '',
-    summary: data.summary || '',
-    tags: data.tags || [],
-    projectId: data.projectId || '',
-    slug: data.slug || slug,
-    content,
+  try {
+    const posts = await convex.query(api.posts.getAllPosts, {});
+    // Ensure posts are sorted by date (newest first)
+    return (posts as Post[]).sort((a: Post, b: Post) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  } catch (error) {
+    // During build, Convex might not be available - return empty array
+    // This allows static generation to succeed
+    if (process.env.NODE_ENV === 'production' && error instanceof Error && error.message.includes('fetch')) {
+      console.warn("Convex not available during build, returning empty posts array");
+      return [];
+    }
+    console.warn("Failed to fetch posts from Convex:", error);
+    return [];
   }
 }
 
-export function getAllPosts(): Post[] {
-  const slugs = getPostSlugs()
-  const posts = slugs
-    .map((slug) => {
-      const slugWithoutExt = slug.replace(/\.mdx$/, '')
-      return getPostBySlugFile(slugWithoutExt)
-    })
-    .filter((post): post is Post => post !== null)
-    .sort((a, b) => {
-      // Sort by date, newest first
-      return new Date(b.date).getTime() - new Date(a.date).getTime()
-    })
-
-  return posts
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const convex = getConvexClient();
+  if (!convex) {
+    return null;
+  }
+  try {
+    const post = await convex.query(api.posts.getPostBySlug, { slug });
+    return post as Post | null;
+  } catch (error) {
+    console.warn("Failed to fetch post from Convex:", error);
+    return null;
+  }
 }
 
-export function getPostBySlug(slug: string): Post | null {
-  return getPostBySlugFile(slug)
-}
-
-export function getLatestPosts(count: number = 5): Post[] {
-  const allPosts = getAllPosts()
-  return allPosts.slice(0, count)
+export async function getLatestPosts(count: number = 5): Promise<Post[]> {
+  const convex = getConvexClient();
+  if (!convex) {
+    return [];
+  }
+  try {
+    const posts = await convex.query(api.posts.getLatestPosts, { count });
+    return posts as Post[];
+  } catch (error) {
+    console.warn("Failed to fetch latest posts from Convex:", error);
+    return [];
+  }
 }
 
 export function getPostsByProjectId(projectId: string) {

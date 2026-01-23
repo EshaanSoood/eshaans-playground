@@ -3,7 +3,8 @@ import createMDX from '@next/mdx'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  output: 'export',
+  // Removed output: 'export' to allow server-side rendering on Vercel
+  // Vercel supports SSR and will optimize automatically
   images: {
     unoptimized: true,
   },

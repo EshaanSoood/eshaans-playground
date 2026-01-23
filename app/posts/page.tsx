@@ -1,6 +1,3 @@
-'use client'
-
-import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { getAllPosts, type Post } from '@/lib/content'
 
@@ -35,43 +32,9 @@ function groupPostsByDate(posts: Post[]): Map<string, Post[]> {
 
 const POSTS_PER_PAGE = 10
 
-export default function PostsPage() {
-  const [allPosts] = useState<Post[]>(getAllPosts())
-  const [displayedPosts, setDisplayedPosts] = useState<Post[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const initialPosts = allPosts.slice(0, POSTS_PER_PAGE)
-    setDisplayedPosts(initialPosts)
-  }, [allPosts])
-
-  useEffect(() => {
-    if (!sentinelRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          const nextPage = currentPage + 1
-          const nextPosts = allPosts.slice(0, nextPage * POSTS_PER_PAGE)
-          if (nextPosts.length > displayedPosts.length) {
-            setDisplayedPosts(nextPosts)
-            setCurrentPage(nextPage)
-          }
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    observer.observe(sentinelRef.current)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [currentPage, allPosts, displayedPosts.length])
-
-  const groupedPosts = groupPostsByDate(displayedPosts)
-  const hasMore = displayedPosts.length < allPosts.length
+export default async function PostsPage() {
+  const allPosts = await getAllPosts()
+  const groupedPosts = groupPostsByDate(allPosts)
 
   return (
     <div className="flex flex-col gap-8">
@@ -93,11 +56,6 @@ export default function PostsPage() {
           </section>
         ))}
       </div>
-      {hasMore && (
-        <div ref={sentinelRef} className="flex justify-center py-4">
-          <span className="sr-only">Loading more posts...</span>
-        </div>
-      )}
     </div>
   )
 }

@@ -9,15 +9,14 @@ function getWordPreview(content: string, wordCount: number = 30): string {
   return words.slice(0, wordCount).join(' ') + '...'
 }
 
-export default function HomePage() {
-  const latestPosts = getLatestPosts(5)
+export default async function HomePage() {
+  const latestPosts = await getLatestPosts(5)
 
   return (
     <div className="flex flex-col gap-8">
       <section>
         <p>
-          Welcome to my blog. Here I share my journey learning web development
-          and building projects.
+          Cards pulled out at random. A place where all my interests converge.
         </p>
       </section>
       <section>

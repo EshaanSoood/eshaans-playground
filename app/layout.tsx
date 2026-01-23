@@ -17,8 +17,8 @@ const merriweather = Merriweather({
 })
 
 export const metadata = {
-  title: 'App',
-  description: '',
+  title: "Eshaan's Playground.",
+  description: 'Cards pulled out at random. A place where all my interests converge.',
 }
 
 export default function RootLayout({
