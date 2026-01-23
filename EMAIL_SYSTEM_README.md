@@ -34,10 +34,10 @@ newsletters/            # Newsletter MDX files (archival)
 scripts/
   send-blog-post.ts     # CLI script to send blog post emails
   send-newsletter.ts    # CLI script to send newsletter emails
-  auto-send-emails.ts   # Automatic email sending (used by GitHub Actions)
+  auto-send-emails.ts   # Legacy script (deprecated - use webhook instead)
 
-.github/workflows/
-  auto-send-emails.yml  # GitHub Actions workflow for automatic email sending
+app/api/email/
+  new-post/route.ts     # Webhook endpoint for sending emails on post publish
 ```
 
 ### Email Flow
@@ -114,14 +114,16 @@ Use the Convex mutation `api.posts.insertPost` to add posts directly to the data
 
 ### Automatic Sending (Recommended)
 
-**Blog posts are automatically sent when pushed to the repository!**
+**Blog posts are automatically sent via webhook when published!**
 
-When you push a new blog post (`.mdx` file in `posts/`) to the `main` or `master` branch, GitHub Actions will:
-1. Detect the new/modified blog post
-2. Migrate it to Convex (if new)
-3. Automatically send it to all active subscribers
+When a post is published (status changes to "published"), call the webhook endpoint:
+1. Your CMS/admin UI calls `POST /api/email/new-post` with the post slug
+2. The endpoint checks if email was already sent (idempotent)
+3. Fetches subscribers from Convex
+4. Sends emails via Postmark
+5. Marks the post as sent in Convex
 
-**No manual action required** - just push your blog post and emails will be sent automatically.
+**Setup**: Configure your CMS/admin UI to call the webhook when publishing a post.
 
 ### Manual Sending
 
@@ -339,58 +341,87 @@ The email template uses these design tokens (from your site):
 └─────────────────────────────────┘
 ```
 
-## Automatic Email Sending
+## Automatic Email Sending (Webhook-Based)
 
-The system includes automatic email sending via GitHub Actions. When you push new blog posts or newsletters to the repository, emails are automatically sent to subscribers.
+The system uses a webhook-based approach for automatic email sending. When a post is published, your CMS/admin UI calls a Vercel API endpoint that sends emails to subscribers.
 
 ### How It Works
 
-1. **GitHub Actions Workflow** (`.github/workflows/auto-send-emails.yml`)
-   - Triggers on push to `main` or `master` branch
-   - Only runs when files in `posts/` or `newsletters/` directories change
-   - Detects new or modified `.mdx` files
-
-2. **Auto-Send Script** (`scripts/auto-send-emails.ts`)
-   - Detects changed files from git diff or GitHub event data
-   - For blog posts: Migrates to Convex, then sends emails
-   - For newsletters: Sends emails directly
-   - Handles errors gracefully and logs results
+1. **Post Published**: When a post status changes to "published" in your CMS/admin UI
+2. **Webhook Call**: Your backend calls `POST /api/email/new-post` with the post slug
+3. **Idempotency Check**: The endpoint checks if email was already sent (prevents duplicates)
+4. **Email Sending**: Fetches subscribers from Convex and sends via Postmark
+5. **Mark as Sent**: Updates the post with `emailCampaignSentAt` timestamp
 
 ### Setup
 
-To enable automatic email sending, configure GitHub Secrets:
-
-1. Go to your repository settings → Secrets and variables → Actions
-2. Add the following secrets:
-   - `CONVEX_URL` - Your Convex deployment URL
+1. **Environment Variables** (set in Vercel):
+   - `CONVEX_URL` or `NEXT_PUBLIC_CONVEX_URL` - Your Convex deployment URL
    - `POSTMARK_SERVER_API_TOKEN` - Your Postmark API token
    - `POSTMARK_FROM_EMAIL` (optional) - Defaults to `newsletter@dreamriver.eshaansood.in`
-   - `NEXT_PUBLIC_BLOG_URL` (optional) - Defaults to `https://dreamriver.eshaansood.in`
+   - `WEBHOOK_SECRET` (recommended) - Secret key for webhook authentication
 
-### Workflow Behavior
+2. **Configure Your CMS/Admin UI**:
+   - When a post is published, make a POST request to `/api/email/new-post`
+   - Include the post slug in the request body: `{ "slug": "your-post-slug" }`
+   - Include webhook secret in Authorization header: `Bearer <WEBHOOK_SECRET>`
 
-- **Blog Posts**: When a new `.mdx` file is added to `posts/`, it's automatically migrated to Convex and sent to subscribers
-- **Newsletters**: When a new `.mdx` file is added to `newsletters/`, it's automatically sent to subscribers
-- **Modified Files**: Modified files are also processed (useful for corrections or updates)
+### Webhook Endpoint
 
-### Testing Before Push
+**POST** `/api/email/new-post`
 
-Before pushing to trigger automatic sending, test locally:
-
-```bash
-# Test blog post
-npx tsx scripts/send-blog-post.ts <slug> --test your@email.com
-
-# Test newsletter
-npx tsx scripts/send-newsletter.ts <filename> --test your@email.com
+**Request Body:**
+```json
+{
+  "slug": "your-post-slug",
+  "webhookSecret": "optional-secret-from-body"
+}
 ```
 
-### Manual Trigger
+**Headers (optional but recommended):**
+```
+Authorization: Bearer <WEBHOOK_SECRET>
+```
 
-You can also manually trigger the workflow:
-1. Go to Actions tab in GitHub
-2. Select "Auto Send Emails" workflow
-3. Click "Run workflow"
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Email campaign sent successfully",
+  "slug": "your-post-slug",
+  "sentCount": 42,
+  "errorCount": 0,
+  "sentAt": "2025-01-24T12:00:00.000Z"
+}
+```
+
+### Idempotency
+
+The endpoint is idempotent - calling it multiple times with the same slug will only send emails once. If emails were already sent, it returns:
+```json
+{
+  "message": "Email campaign already sent for this post",
+  "slug": "your-post-slug",
+  "sentAt": "2025-01-24T10:00:00.000Z"
+}
+```
+
+### Testing
+
+Test the webhook endpoint:
+
+```bash
+# Using curl
+curl -X POST https://your-domain.com/api/email/new-post \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_WEBHOOK_SECRET" \
+  -d '{"slug": "your-post-slug"}'
+
+# Or test locally
+curl -X POST http://localhost:3000/api/email/new-post \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "your-post-slug"}'
+```
 
 ## Environment Variables
 
@@ -409,7 +440,7 @@ POSTMARK_FROM_EMAIL=newsletter@dreamriver.eshaansood.in
 NEXT_PUBLIC_BLOG_URL=https://dreamriver.eshaansood.in
 ```
 
-**Note**: These should be set as GitHub Secrets for the automatic workflow to work.
+**Note**: These should be set as environment variables in Vercel for the webhook endpoint to work.
 
 ## Subscribers
 

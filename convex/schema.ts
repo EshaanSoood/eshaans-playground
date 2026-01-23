@@ -10,6 +10,7 @@ export default defineSchema({
     projectId: v.string(),
     slug: v.string(),
     content: v.string(),
+    emailCampaignSentAt: v.optional(v.number()),
   }).index("by_slug", ["slug"]).index("by_date", ["date"]),
   subscribers: defineTable({
     email: v.string(),

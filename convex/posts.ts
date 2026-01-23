@@ -94,3 +94,29 @@ export const insertPost = mutation({
     }
   },
 });
+
+/**
+ * Mark a post's email campaign as sent
+ * This is called after successfully sending emails to prevent duplicate sends
+ */
+export const markEmailCampaignSent = mutation({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx: MutationCtx, args: { slug: string }) => {
+    const post = await ctx.db
+      .query("posts")
+      .withIndex("by_slug", (q: any) => q.eq("slug", args.slug))
+      .first();
+    
+    if (!post) {
+      throw new Error(`Post with slug "${args.slug}" not found`);
+    }
+    
+    await ctx.db.patch(post._id, {
+      emailCampaignSentAt: Date.now(),
+    });
+    
+    return post._id;
+  },
+});
