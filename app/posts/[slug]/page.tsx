@@ -21,22 +21,12 @@ function formatDate(dateString: string): string {
   })
 }
 
-export async function generateStaticParams() {
-  try {
-    const posts = await getAllPosts()
-    // Return empty array if no posts - Next.js will handle this gracefully
-    if (!posts || posts.length === 0) {
-      return []
-    }
-    return posts.map((post) => ({
-      slug: post.slug,
-    }))
-  } catch (error) {
-    console.warn("Failed to generate static params:", error)
-    // Return empty array to allow build to succeed
-    return []
-  }
-}
+// Force dynamic rendering to fetch posts at request time
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Revalidate every 60 seconds
+
+// Note: generateStaticParams is disabled to allow dynamic post fetching
+// Posts are fetched at request time from Convex
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const post = await getPostBySlug(params.slug)
