@@ -142,10 +142,35 @@
 
   a {
     color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    background: transparent !important;
+    border: none !important;
+    outline: none;
+    box-shadow: none !important;
   }
 
   a:hover {
     color: var(--link-hover);
+    text-decoration-thickness: 2px;
+  }
+
+  a:focus {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove any link boxes from rehype-autolink-headings */
+  a.anchor {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   figure {
@@ -169,20 +194,68 @@
     padding-left: 40px;
   }
 
-  blockquote {
-    margin-bottom: 1.5em;
+  /* Code blocks from rehype-highlight */
+  pre {
+    background: var(--bg-soft) !important;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 1em;
+    margin: 1.5em 0;
+    overflow-x: auto;
+    line-height: 1.6;
   }
 
-  /* Ensure article content has no background box */
-  article,
-  article > div,
-  article > div > * {
-    background: transparent !important;
+  code {
+    background: var(--bg-soft);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
   }
 
-  /* Remove any default MDX wrapper backgrounds */
-  main > article,
-  main > article > div {
-    background-color: transparent;
+  pre code {
+    background: transparent;
+    padding: 0;
   }
+}
+
+/* Styles outside @layer base for higher specificity */
+/* Ensure article content has no background box - target all possible wrappers */
+main article,
+main article > div,
+main article > div > *,
+article,
+article > div,
+article > div > *,
+article > div > div,
+[class*="mdx"],
+[class*="content"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Remove backgrounds from MDX-generated content specifically */
+main article > div > p,
+main article > div > h1,
+main article > div > h2,
+main article > div > h3,
+main article > div > h4,
+main article > div > h5,
+main article > div > h6,
+main article > div > ul,
+main article > div > ol,
+main article > div > blockquote,
+main article > div > figure,
+main article > div > img {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Ensure links in article content have no boxes */
+main article a,
+article a {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: inline;
 }
