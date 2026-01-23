@@ -1,6 +1,44 @@
+@import './reset.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* Backgrounds */
+  --bg-main: #D9DAD5;        /* paper-like off white */
+  --bg-card: #F0F1ED;        /* posts / sections */
+  --bg-soft: #E7E9E3;        /* subtle panels */
+
+  /* Text */
+  --text-main: #1F2A33;      /* soft charcoal */
+  --text-secondary: #4F6473; /* muted blue-grey */
+  --text-light: #7C93A3;     /* metadata, dates */
+
+  /* Blues (from swatches) */
+  --blue-soft: #97B2C3;      /* light wash */
+  --blue-muted: #597191;    /* slate blue */
+  --blue-deep: #094881;     /* ink blue */
+
+  /* Warm accent */
+  --orange-soft: #E3A48A;   /* light peach wash */
+  --orange-main: #C14A23;   /* burnt orange */
+  --orange-deep: #9E3B1C;
+
+  /* Borders & separators */
+  --border-light: #C6CBC8;
+  --border-soft: #B7BDC0;
+
+  /* UI roles */
+  --link: var(--blue-deep);
+  --link-hover: var(--blue-muted);
+
+  --accent: var(--orange-main);
+  --accent-soft: var(--orange-soft);
+
+  --selection-bg: #C14A23;
+  --selection-text: #FFFFFF;
+}
 
 /* Typography is locked here.
    Do NOT use font-* Tailwind utilities in components. */
@@ -12,12 +50,17 @@
   body {
     margin: 0;
     min-height: 100%;
-    background-color: #fff;
+    background-color: var(--bg-main);
     font-family: var(--font-inter), system-ui, -apple-system,
       "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
-    color: #333;
+    color: var(--text-main);
+  }
+
+  ::selection {
+    background-color: var(--selection-bg);
+    color: var(--selection-text);
   }
 
   img {
@@ -81,9 +124,17 @@
   blockquote {
     margin: 0 0 10px 0;
     padding: 10px 20px;
-    border-left: 5px solid #e2e2e2;
+    border-left: 5px solid var(--border-soft);
     font-size: 18px;
     line-height: 22px;
+  }
+
+  a {
+    color: var(--link);
+  }
+
+  a:hover {
+    color: var(--link-hover);
   }
 
   figure {

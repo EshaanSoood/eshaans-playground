@@ -10,13 +10,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Project accent colors
-        'project-blue': '#3b82f6',
-        'project-emerald': '#10b981',
-        'project-violet': '#8b5cf6',
-        'project-amber': '#f59e0b',
-        'project-rose': '#f43f5e',
-        'project-cyan': '#06b6d4',
+        // Backgrounds
+        'bg-main': 'var(--bg-main)',
+        'bg-card': 'var(--bg-card)',
+        'bg-soft': 'var(--bg-soft)',
+        // Text
+        'text-main': 'var(--text-main)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-light': 'var(--text-light)',
+        // Blues
+        'blue-soft': 'var(--blue-soft)',
+        'blue-muted': 'var(--blue-muted)',
+        'blue-deep': 'var(--blue-deep)',
+        // Oranges
+        'orange-soft': 'var(--orange-soft)',
+        'orange-main': 'var(--orange-main)',
+        'orange-deep': 'var(--orange-deep)',
+        // Borders
+        'border-light': 'var(--border-light)',
+        'border-soft': 'var(--border-soft)',
+        // UI roles
+        'link': 'var(--link)',
+        'link-hover': 'var(--link-hover)',
+        'accent': 'var(--accent)',
+        'accent-soft': 'var(--accent-soft)',
       },
     },
     fontFamily: {
