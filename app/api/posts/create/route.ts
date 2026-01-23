@@ -71,17 +71,12 @@ export async function POST(request: NextRequest) {
 
     const convex = new ConvexHttpClient(convexUrl);
 
-    // Check if post already exists
+    // Check if post already exists - if it does, we'll update it
     const existing = await convex.query(api.posts.getPostBySlug, { slug });
-    if (existing) {
-      return NextResponse.json(
-        { error: `Post with slug "${slug}" already exists` },
-        { status: 409 }
-      );
-    }
+    const isUpdate = !!existing;
 
-    // Create post in Convex
-    console.log(`📝 Creating post "${title}" (${slug}) in Convex...`);
+    // Create or update post in Convex (insertPost handles both)
+    console.log(`📝 ${isUpdate ? 'Updating' : 'Creating'} post "${title}" (${slug}) in Convex...`);
     const postId = await convex.mutation(api.posts.insertPost, {
       title,
       date,
@@ -92,7 +87,7 @@ export async function POST(request: NextRequest) {
       content,
     });
 
-    console.log(`✅ Post created successfully with ID: ${postId}`);
+    console.log(`✅ Post ${isUpdate ? 'updated' : 'created'} successfully with ID: ${postId}`);
 
     // Automatically send email if requested
     if (sendEmail) {
@@ -140,40 +135,43 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             {
               success: true,
-              message: "Post created and email sent successfully",
+              message: `Post ${isUpdate ? 'updated' : 'created'} and email sent successfully`,
               postId,
               slug,
               emailSent: true,
               emailResult,
+              updated: isUpdate,
             },
-            { status: 201 }
+            { status: isUpdate ? 200 : 201 }
           );
         } else {
-          console.error(`⚠️  Post created but email failed:`, emailResult);
+          console.error(`⚠️  Post ${isUpdate ? 'updated' : 'created'} but email failed:`, emailResult);
           return NextResponse.json(
             {
               success: true,
-              message: "Post created but email sending failed",
+              message: `Post ${isUpdate ? 'updated' : 'created'} but email sending failed`,
               postId,
               slug,
               emailSent: false,
               emailError: emailResult,
+              updated: isUpdate,
             },
-            { status: 201 }
+            { status: isUpdate ? 200 : 201 }
           );
         }
       } catch (emailError) {
-        console.error(`⚠️  Post created but email webhook failed:`, emailError);
+        console.error(`⚠️  Post ${isUpdate ? 'updated' : 'created'} but email webhook failed:`, emailError);
         return NextResponse.json(
           {
             success: true,
-            message: "Post created but email webhook failed",
+            message: `Post ${isUpdate ? 'updated' : 'created'} but email webhook failed`,
             postId,
             slug,
             emailSent: false,
             emailError: emailError instanceof Error ? emailError.message : String(emailError),
+            updated: isUpdate,
           },
-          { status: 201 }
+          { status: isUpdate ? 200 : 201 }
         );
       }
     }
@@ -181,12 +179,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: "Post created successfully",
+        message: `Post ${isUpdate ? 'updated' : 'created'} successfully`,
         postId,
         slug,
         emailSent: false,
+        updated: isUpdate,
       },
-      { status: 201 }
+      { status: isUpdate ? 200 : 201 }
     );
   } catch (error) {
     console.error("Error in /api/posts/create:", error);
