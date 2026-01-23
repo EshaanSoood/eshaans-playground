@@ -12,8 +12,12 @@ import { api } from "../convex/_generated/api";
 import { sendBlogPostToSubscribers } from "../lib/email-blog";
 import { sendNewsletterToSubscribers, getNewsletterData } from "../lib/email-newsletter";
 
-// Load environment variables
-dotenv.config({ path: resolve(__dirname, "../.env.local") });
+// Load environment variables (optional - GitHub Actions uses env vars directly)
+// Try to load .env.local if it exists, but don't fail if it doesn't
+const envPath = resolve(process.cwd(), ".env.local");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+}
 
 interface ChangedFile {
   path: string;
@@ -23,7 +27,7 @@ interface ChangedFile {
 /**
  * Parse changed files from GitHub Actions or git diff
  */
-function getChangedFiles(): ChangedFile[] {
+async function getChangedFiles(): Promise<ChangedFile[]> {
   const changedFiles: ChangedFile[] = [];
   
   // Check if running in GitHub Actions
@@ -76,16 +80,16 @@ function getChangedFiles(): ChangedFile[] {
   
   // Fallback: use git diff (works in GitHub Actions and locally)
   if (changedFiles.length === 0) {
-    const { execSync } = require("child_process");
     try {
-      // Try to get diff between commits
-      let diffCommand = `git diff --name-status ${githubBaseRef} ${githubSha || "HEAD"}`;
-      if (!githubSha) {
-        // Local: compare with previous commit
-        diffCommand = "git diff --name-status HEAD~1 HEAD";
-      }
+      const childProcess = await import("child_process");
+      const { execSync } = childProcess;
+      // In GitHub Actions, compare with the previous commit
+      // Use HEAD^ to compare with the commit before the current one
+      const diffCommand = githubSha 
+        ? `git diff --name-status HEAD^ HEAD`
+        : "git diff --name-status HEAD~1 HEAD";
       
-      const diff = execSync(diffCommand, { encoding: "utf8", stdio: "pipe" });
+      const diff = execSync(diffCommand, { encoding: "utf8", stdio: "pipe", cwd: process.cwd() });
       diff.split("\n").forEach((line: string) => {
         if (line.trim()) {
           const parts = line.split("\t");
@@ -103,6 +107,7 @@ function getChangedFiles(): ChangedFile[] {
       });
     } catch (error) {
       console.warn("Could not get git diff:", error instanceof Error ? error.message : String(error));
+      // If git diff fails, we'll fall back to checking all files
     }
   }
   
@@ -142,13 +147,26 @@ async function migratePostToConvex(slug: string, convexUrl: string): Promise<voi
  * Main function to detect and send emails
  */
 async function main() {
+  console.log("🚀 Starting auto-send-emails script...");
+  console.log("Environment check:");
+  console.log(`  CONVEX_URL: ${process.env.CONVEX_URL ? "✅ Set" : "❌ Not set"}`);
+  console.log(`  NEXT_PUBLIC_CONVEX_URL: ${process.env.NEXT_PUBLIC_CONVEX_URL ? "✅ Set" : "❌ Not set"}`);
+  console.log(`  POSTMARK_SERVER_API_TOKEN: ${process.env.POSTMARK_SERVER_API_TOKEN ? "✅ Set" : "❌ Not set"}`);
+  
   const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
   
   if (!convexUrl) {
-    throw new Error("CONVEX_URL or NEXT_PUBLIC_CONVEX_URL environment variable is not set");
+    console.error("❌ Error: CONVEX_URL or NEXT_PUBLIC_CONVEX_URL environment variable is not set");
+    process.exit(1);
   }
   
-  let changedFiles = getChangedFiles();
+  if (!process.env.POSTMARK_SERVER_API_TOKEN) {
+    console.error("❌ Error: POSTMARK_SERVER_API_TOKEN environment variable is not set");
+    process.exit(1);
+  }
+  
+  let changedFiles = await getChangedFiles();
+  console.log(`📋 Found ${changedFiles.length} changed file(s)`);
   
   if (changedFiles.length === 0) {
     console.log("No changed files detected. Checking all files in posts/ and newsletters/...");
