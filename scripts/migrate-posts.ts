@@ -9,8 +9,12 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import * as dotenv from 'dotenv';
 import { ConvexHttpClient } from 'convex/browser';
-import type { api } from '../convex/_generated/api';
+import { api } from '../convex/_generated/api';
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
@@ -53,9 +57,9 @@ function getPostData(slug: string): PostData | null {
 }
 
 async function migratePosts() {
-  const convexUrl = process.env.CONVEX_URL;
+  const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
   if (!convexUrl) {
-    console.error('Error: CONVEX_URL environment variable is not set.');
+    console.error('Error: CONVEX_URL or NEXT_PUBLIC_CONVEX_URL environment variable is not set.');
     console.error('Please set it in your .env file or run: export CONVEX_URL=your_convex_url');
     process.exit(1);
   }
@@ -68,21 +72,44 @@ async function migratePosts() {
     return;
   }
 
-  console.log(`Found ${postFiles.length} posts to migrate...`);
+  console.log(`Found ${postFiles.length} posts to migrate...\n`);
 
-  // Note: You'll need to create a mutation in convex/posts.ts to insert posts
-  // For now, this script shows the structure - you'll need to add:
-  // export const insertPost = mutation({...}) in convex/posts.ts
-  console.log('Note: You need to create an insertPost mutation in convex/posts.ts first.');
-  console.log('Posts to migrate:');
-  
   for (const file of postFiles) {
     const slug = file.replace(/\.mdx$/, '');
     const post = getPostData(slug);
-    if (post) {
-      console.log(`- ${post.title} (${post.slug})`);
+    
+    if (!post) {
+      console.log(`⚠️  Skipping ${slug} - could not read post data`);
+      continue;
+    }
+
+    try {
+      // Check if post already exists
+      const existing = await convex.query(api.posts.getPostBySlug, { slug: post.slug });
+      
+      if (existing) {
+        console.log(`ℹ️  Post "${post.title}" already exists in Convex, skipping...`);
+        continue;
+      }
+
+      // Insert post into Convex
+      await convex.mutation(api.posts.insertPost, {
+        title: post.title,
+        date: post.date,
+        summary: post.summary,
+        tags: post.tags,
+        projectId: post.projectId,
+        slug: post.slug,
+        content: post.content,
+      });
+
+      console.log(`✅ Migrated "${post.title}" (${post.slug})`);
+    } catch (error) {
+      console.error(`❌ Failed to migrate "${post.title}":`, error);
     }
   }
+
+  console.log('\n✨ Migration complete!');
 }
 
 migratePosts().catch(console.error);

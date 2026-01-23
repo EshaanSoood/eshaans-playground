@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { getLatestPosts } from '@/lib/content'
 
+// Force dynamic rendering to fetch posts at request time
+export const dynamic = 'force-dynamic'
+export const revalidate = 60 // Revalidate every 60 seconds
+
 function getWordPreview(content: string, wordCount: number = 30): string {
   const words = content.trim().split(/\s+/)
   if (words.length <= wordCount) {
