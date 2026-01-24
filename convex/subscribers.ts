@@ -146,3 +146,49 @@ export const getSubscriberCount = query({
     return allSubscribers.length;
   },
 });
+
+/**
+ * Remove duplicate subscribers, keeping the oldest entry for each email
+ */
+export const removeDuplicates = mutation({
+  args: {},
+  handler: async (ctx: MutationCtx) => {
+    const allSubscribers = await ctx.db.query("subscribers").collect();
+    
+    // Group by email (case-insensitive)
+    const emailMap = new Map<string, typeof allSubscribers>();
+    
+    for (const subscriber of allSubscribers) {
+      const email = subscriber.email.toLowerCase().trim();
+      if (!emailMap.has(email)) {
+        emailMap.set(email, []);
+      }
+      emailMap.get(email)!.push(subscriber);
+    }
+    
+    let deleted = 0;
+    let kept = 0;
+    
+    // For each email with duplicates, keep the oldest and delete the rest
+    for (const [email, subscribers] of emailMap.entries()) {
+      if (subscribers.length > 1) {
+        // Sort by creation time (oldest first)
+        subscribers.sort((a, b) => a._creationTime - b._creationTime);
+        
+        // Keep the first (oldest) one
+        const toKeep = subscribers[0];
+        kept++;
+        
+        // Delete the rest
+        for (let i = 1; i < subscribers.length; i++) {
+          await ctx.db.delete(subscribers[i]._id);
+          deleted++;
+        }
+      } else {
+        kept++;
+      }
+    }
+    
+    return { deleted, kept, totalUnique: emailMap.size };
+  },
+});

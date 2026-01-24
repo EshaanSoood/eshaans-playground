@@ -12,8 +12,8 @@
 
   /* Text */
   --text-main: #1F2A33;      /* soft charcoal */
-  --text-secondary: #4F6473; /* muted blue-grey */
-  --text-light: #7C93A3;     /* metadata, dates */
+  --text-secondary: #3D5261; /* muted blue-grey - darkened for WCAG AA */
+  --text-light: #5A6F7F;     /* metadata, dates - darkened for WCAG AA */
 
   /* Blues (from swatches) */
   --blue-soft: #97B2C3;      /* light wash */
@@ -53,7 +53,7 @@
     background-color: var(--bg-main);
     font-family: var(--font-inter), system-ui, -apple-system,
       "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.75;
     color: var(--text-main);
   }
@@ -68,16 +68,22 @@
     height: auto;
     vertical-align: middle;
     display: block;
-    margin: 2.5em auto;
+    margin: 2em auto;
     object-fit: contain;
     border-radius: 2px;
+  }
+
+  @media (min-width: 640px) {
+    img {
+      margin: 2.5em auto;
+    }
   }
 
   /* Constrain images in article content to readable width */
   article img,
   [class*="prose"] img,
   main img {
-    max-width: min(100%, 800px);
+    max-width: 100%;
     width: auto;
   }
 
@@ -119,14 +125,14 @@
   }
 
   h5 {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 16px;
+    line-height: 22px;
     margin-top: 10px;
   }
 
   h6 {
-    font-size: 12px;
-    line-height: 18px;
+    font-size: 14px;
+    line-height: 20px;
     margin-top: 10px;
   }
 
@@ -144,21 +150,28 @@
     color: var(--text-secondary);
     font-style: italic;
     font-weight: 300;
-    max-width: 85%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  @media (min-width: 640px) {
+    blockquote {
+      max-width: 85%;
+    }
   }
 
   a {
     color: var(--text-secondary);
     text-decoration: underline;
-    text-decoration-thickness: 0.5px;
+    text-decoration-thickness: 1px;
+    -webkit-text-decoration-thickness: 1px;
     text-decoration-color: var(--text-light);
     text-underline-offset: 3px;
-    background: transparent !important;
-    border: none !important;
+    background: transparent;
+    border: none;
     outline: none;
-    box-shadow: none !important;
+    box-shadow: none;
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
 
@@ -171,9 +184,9 @@
   a:focus {
     outline: 2px solid var(--link);
     outline-offset: 2px;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
 
   /* Remove any link boxes from rehype-autolink-headings */
@@ -207,7 +220,14 @@
   ol {
     margin-top: 0px;
     margin-bottom: 1.5em;
-    padding-left: 40px;
+    padding-left: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    ul,
+    ol {
+      padding-left: 40px;
+    }
   }
 
   /* Code blocks from rehype-highlight */
@@ -225,7 +245,7 @@
     background: var(--bg-soft);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: 0.9em;
+    font-size: 1em;
   }
 
   pre code {
@@ -235,44 +255,22 @@
 }
 
 /* Styles outside @layer base for higher specificity */
-/* Ensure article content has no background box - target all possible wrappers */
+/* Ensure article content has no background box - scoped selector */
 main article,
-main article > div,
-main article > div > *,
+main article > *,
 article,
-article > div,
-article > div > *,
-article > div > div,
-[class*="mdx"],
-[class*="content"] {
-  background: transparent !important;
-  background-color: transparent !important;
-}
-
-/* Remove backgrounds from MDX-generated content specifically */
-main article > div > p,
-main article > div > h1,
-main article > div > h2,
-main article > div > h3,
-main article > div > h4,
-main article > div > h5,
-main article > div > h6,
-main article > div > ul,
-main article > div > ol,
-main article > div > blockquote,
-main article > div > figure,
-main article > div > img {
-  background: transparent !important;
-  background-color: transparent !important;
+article > * {
+  background: transparent;
+  background-color: transparent;
 }
 
 /* Ensure links in article content have no boxes */
 main article a,
 article a {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
   display: inline;
 }
 
@@ -280,16 +278,30 @@ article a {
 main {
   max-width: 700px;
   margin: 0 auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  main {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 /* Header nav in same content column */
 header nav {
   max-width: 700px;
   margin: 0 auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  header nav {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 /* Reduce vertical space under header */
@@ -322,9 +334,7 @@ time {
   font-weight: 400;
   margin-top: 0.25em;
   display: block;
-}
-
-/* Softer image edges */
+}/* Softer image edges */
 article img,
 main img {
   border-radius: 3px;
