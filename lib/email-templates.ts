@@ -19,10 +19,9 @@ function formatDate(dateString: string): string {
 
 /**
  * Generate unsubscribe link for a subscriber
+ * Links to the unsubscribe page at /unsubscribe with the email as a query parameter
  */
 function getUnsubscribeLink(email: string): string {
-  // This will need to be implemented with your unsubscribe endpoint
-  // For now, using a placeholder that should be replaced with actual unsubscribe functionality
   return `${BLOG_URL}/unsubscribe?email=${encodeURIComponent(email)}`;
 }
 

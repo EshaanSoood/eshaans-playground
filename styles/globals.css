@@ -104,6 +104,16 @@
     margin-top: 20px;
   }
 
+  h1::before,
+  h1::after {
+    content: none !important;
+  }
+
+  h1 > *::before,
+  h1 > *::after {
+    content: none !important;
+  }
+
   h2 {
     font-size: 28px;
     line-height: 34px;
@@ -196,6 +206,53 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
+  }
+
+  a.anchor::before,
+  a.anchor::after {
+    content: none !important;
+  }
+
+  /* Prevent caret/vertical bar from appearing under h1 */
+  article header h1 {
+    caret-color: transparent !important;
+  }
+
+  article header h1:focus,
+  article header h1:focus-visible {
+    outline: none !important;
+    border: none !important;
+  }
+
+  article header h1 * {
+    caret-color: transparent !important;
+  }
+
+  article header h1 *:focus,
+  article header h1 *:focus-visible {
+    outline: none !important;
+    border: none !important;
+  }
+
+  /* Remove any empty spans or anchors that might show caret */
+  article header h1 > span:empty,
+  article header h1 > a:empty {
+    display: none !important;
+  }
+
+  /* Ensure no contenteditable shows caret */
+  article header h1[contenteditable],
+  article header h1 [contenteditable] {
+    caret-color: transparent !important;
+  }
+
+  /* Remove any borders or outlines that could appear as vertical bar */
+  article header h1 {
+    border: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
   }
 
   figure {

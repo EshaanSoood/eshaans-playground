@@ -63,7 +63,7 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <article className="flex flex-col gap-4">
       <header className="flex flex-col gap-2">
-        <h1>{post.title}</h1>
+        <h1 id={`post-${slug}`}>{post.title}</h1>
         <time>{formatDate(post.date)}</time>
       </header>
       <div>
