@@ -1,4 +1,9 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
 import createMDX from '@next/mdx'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -7,6 +12,9 @@ const nextConfig = {
   // Vercel supports SSR and will optimize automatically
   images: {
     unoptimized: true,
+  },
+  turbopack: {
+    root: __dirname,
   },
 }
 
@@ -29,4 +37,3 @@ const withMDX = createMDX({
 })
 
 export default withMDX(nextConfig)
-

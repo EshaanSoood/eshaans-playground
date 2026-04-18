@@ -35,13 +35,17 @@ const config: Config = {
         'accent': 'var(--accent)',
         'accent-soft': 'var(--accent-soft)',
       },
-    },
-    fontFamily: {
-      sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-      mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+      },
+      boxShadow: {
+        paper: '0 20px 55px rgba(35, 67, 113, 0.10)',
+        'paper-strong': '0 28px 70px rgba(35, 67, 113, 0.16)',
+      },
     },
   },
   plugins: [],
 }
 export default config
-

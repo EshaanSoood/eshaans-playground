@@ -1,8 +1,8 @@
 /**
- * API route for creating a new blog post and automatically sending emails
- * 
+ * API route for creating or updating a blog post in the external Payload CMS.
+ *
  * POST /api/posts/create
- * 
+ *
  * Body:
  *   - title: string (required)
  *   - date: string (required) - ISO date string
@@ -11,13 +11,14 @@
  *   - projectId: string (required)
  *   - slug: string (required)
  *   - content: string (required) - MDX content
+ *   - published: boolean (optional) - Whether the post should be public (default: true)
  *   - sendEmail: boolean (optional) - Whether to send email immediately (default: true)
  *   - webhookSecret: string (optional) - For authentication
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+
+import { upsertManagedPost } from "@/lib/payload-cms";
 
 export const dynamic = 'force-dynamic';
 
@@ -32,11 +33,11 @@ export async function POST(request: NextRequest) {
       projectId,
       slug,
       content,
+      published = true,
       sendEmail = true,
       webhookSecret: bodySecret,
     } = body;
 
-    // Validate required fields
     if (!title || !date || !summary || !tags || !projectId || !slug || !content) {
       return NextResponse.json(
         { error: "Missing required fields: title, date, summary, tags, projectId, slug, content" },
@@ -44,7 +45,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify webhook secret
     const authHeader = request.headers.get("authorization");
     const webhookSecret = process.env.WEBHOOK_SECRET?.trim();
 
@@ -61,24 +61,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Get Convex URL
-    const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
-    if (!convexUrl) {
-      return NextResponse.json(
-        { error: "Server configuration error: CONVEX_URL not set" },
-        { status: 500 }
-      );
-    }
-
-    const convex = new ConvexHttpClient(convexUrl);
-
-    // Check if post already exists - if it does, we'll update it
-    const existing = await convex.query(api.posts.getPostBySlug, { slug });
-    const isUpdate = !!existing;
-
-    // Create or update post in Convex (insertPost handles both)
-    console.log(`📝 ${isUpdate ? 'Updating' : 'Creating'} post "${title}" (${slug}) in Convex...`);
-    const postId = await convex.mutation(api.posts.insertPost, {
+    console.log(`📝 Syncing post "${title}" (${slug}) to Payload CMS...`);
+    const result = await upsertManagedPost({
       title,
       date,
       summary,
@@ -86,31 +70,31 @@ export async function POST(request: NextRequest) {
       projectId,
       slug,
       content,
+      published,
     });
 
-    console.log(`✅ Post ${isUpdate ? 'updated' : 'created'} successfully with ID: ${postId}`);
+    const isUpdate = !result.created;
+    const postId = result.post.id;
 
-    // Automatically send email if requested
+    console.log(`✅ Post ${isUpdate ? 'updated' : 'created'} successfully in Payload CMS with ID: ${postId}`);
+
     if (sendEmail) {
-      // Determine the correct base URL
       let blogUrl = process.env.NEXT_PUBLIC_BLOG_URL;
-      
-      // If not set, try to construct from request
+
       if (!blogUrl) {
         const host = request.headers.get('host');
         const protocol = request.headers.get('x-forwarded-proto') || 'https';
         blogUrl = `${protocol}://${host}`;
       }
-      
-      // Fallback to production URL
+
       if (!blogUrl) {
         blogUrl = 'https://blog.eshaansood.in';
       }
-      
+
       const emailWebhookUrl = `${blogUrl}/api/email/new-post`;
-      
+
       console.log(`📧 Triggering email webhook for post "${slug}"...`);
-      
+
       try {
         const emailHeaders: Record<string, string> = {
           'Content-Type': 'application/json',
@@ -132,7 +116,6 @@ export async function POST(request: NextRequest) {
         const emailResult = await emailResponse.json();
 
         if (emailResponse.ok) {
-          console.log(`✅ Email campaign sent successfully to ${emailResult.sentCount || 0} subscribers`);
           return NextResponse.json(
             {
               success: true,

@@ -1,30 +1,22 @@
 /**
  * API route for subscribing to the newsletter
- * 
- * POST /api/subscribers/subscribe
- * 
- * Body:
- *   - firstName: string (required)
- *   - lastName: string (required)
- *   - email: string (required)
- *   - honeypot: string (optional) - must be empty for valid submissions
+ *
+ * Legacy compatibility wrapper.
+ * New UI should call Listmonk directly from the browser.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import {
+  LISTMONK_PUBLIC_SUBSCRIPTION_URL,
+  buildPublicSubscriptionPayload,
+} from "@/lib/listmonk-public";
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      firstName,
-      lastName,
-      email,
-      honeypot,
-    } = body;
+    const { firstName, lastName, email, honeypot } = body;
 
     // Honeypot check - if filled, it's spam
     if (honeypot && honeypot.trim() !== '') {
@@ -71,50 +63,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Convex URL
-    const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
-    if (!convexUrl) {
-      return NextResponse.json(
-        { error: "Server configuration error: CONVEX_URL not set" },
-        { status: 500 }
-      );
-    }
-
-    const convex = new ConvexHttpClient(convexUrl);
-
-    // Combine firstName and lastName into name field
-    const name = `${trimmedFirstName} ${trimmedLastName}`;
-
-    // Add subscriber to Convex
-    const subscriberId = await convex.mutation(api.subscribers.addSubscriber, {
-      email: trimmedEmail.toLowerCase(),
-      name,
-      source: "website-modal",
+    const listmonkResponse = await fetch(LISTMONK_PUBLIC_SUBSCRIPTION_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(
+        buildPublicSubscriptionPayload({
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
+          email: trimmedEmail.toLowerCase(),
+        })
+      ),
     });
 
-    if (subscriberId === null) {
-      // Subscriber already exists and is active
+    const listmonkText = await listmonkResponse.text();
+    const listmonkData = listmonkText ? JSON.parse(listmonkText) : null;
+
+    if (!listmonkResponse.ok) {
       return NextResponse.json(
         {
-          success: true,
-          message: "You're already subscribed!",
-          alreadySubscribed: true,
+          error: listmonkData?.message || "Failed to subscribe",
         },
-        { status: 200 }
+        { status: listmonkResponse.status }
       );
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Thank you for subscribing!",
-        subscriberId,
+        message: "Success. Check your email to confirm your subscription.",
+        provider: "listmonk",
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error in /api/subscribers/subscribe:", error);
-
     return NextResponse.json(
       {
         error: "Internal server error",
@@ -127,7 +111,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json(
-    { error: "Method not allowed. Use POST." },
+    {
+      error:
+        "Method not allowed. Use POST to subscribe, or call Listmonk directly from the browser.",
+    },
     { status: 405 }
   );
 }

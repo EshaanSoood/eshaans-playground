@@ -5,54 +5,50 @@
 @tailwind utilities;
 
 :root {
-  /* Backgrounds */
-  --bg-main: #D9DAD5;        /* paper-like off white */
-  --bg-card: #F0F1ED;        /* posts / sections */
-  --bg-soft: #E7E9E3;        /* subtle panels */
+  --bg-main: #ffebdb;
+  --bg-card: #fff7f1;
+  --bg-soft: #f3ddd0;
 
-  /* Text */
-  --text-main: #1F2A33;      /* soft charcoal */
-  --text-secondary: #3D5261; /* muted blue-grey - darkened for WCAG AA */
-  --text-light: #5A6F7F;     /* metadata, dates - darkened for WCAG AA */
+  --text-main: #234371;
+  --text-secondary: #3f618a;
+  --text-light: #6c8097;
 
-  /* Blues (from swatches) */
-  --blue-soft: #97B2C3;      /* light wash */
-  --blue-muted: #597191;    /* slate blue */
-  --blue-deep: #094881;     /* ink blue */
+  --blue-soft: #d7e2ed;
+  --blue-muted: #5e85ab;
+  --blue-deep: #234371;
 
-  /* Warm accent */
-  --orange-soft: #E3A48A;   /* light peach wash */
-  --orange-main: #C14A23;   /* burnt orange */
-  --orange-deep: #9E3B1C;
+  --orange-soft: #e9beab;
+  --orange-main: #b34036;
+  --orange-deep: #8c3029;
 
-  /* Borders & separators */
-  --border-light: #C6CBC8;
-  --border-soft: #B7BDC0;
+  --border-light: rgba(35, 67, 113, 0.16);
+  --border-soft: rgba(35, 67, 113, 0.28);
 
-  /* UI roles */
   --link: var(--blue-deep);
-  --link-hover: var(--blue-muted);
-
+  --link-hover: var(--orange-main);
   --accent: var(--orange-main);
   --accent-soft: var(--orange-soft);
 
-  --selection-bg: #C14A23;
-  --selection-text: #FFFFFF;
+  --selection-bg: #b34036;
+  --selection-text: #ffffff;
 }
 
-/* Typography is locked here.
-   Do NOT use font-* Tailwind utilities in components. */
 @layer base {
   html {
     height: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
-    margin: 0;
     min-height: 100%;
+    margin: 0;
     background-color: var(--bg-main);
-    font-family: var(--font-inter), system-ui, -apple-system,
-      "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-image:
+      radial-gradient(circle at top, rgba(94, 133, 171, 0.22), transparent 34%),
+      radial-gradient(circle at 16% 18%, rgba(179, 64, 54, 0.14), transparent 22%),
+      linear-gradient(180deg, #fff7f1 0%, #ffebdb 28%, #ffebdb 100%);
+    font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      sans-serif;
     font-size: 16px;
     line-height: 1.75;
     color: var(--text-main);
@@ -64,27 +60,13 @@
   }
 
   img {
+    display: block;
     max-width: 100%;
     height: auto;
-    vertical-align: middle;
-    display: block;
-    margin: 2em auto;
+    margin: 2.2em auto;
+    border-radius: 1.25rem;
     object-fit: contain;
-    border-radius: 2px;
-  }
-
-  @media (min-width: 640px) {
-    img {
-      margin: 2.5em auto;
-    }
-  }
-
-  /* Constrain images in article content to readable width */
-  article img,
-  [class*="prose"] img,
-  main img {
-    max-width: 100%;
-    width: auto;
+    vertical-align: middle;
   }
 
   h1,
@@ -93,171 +75,81 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
-    font-weight: bold;
-    margin-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 0.6em;
+    font-family: var(--font-display), Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 
   h1 {
-    font-size: 38px;
-    line-height: 44px;
-    margin-top: 20px;
-  }
-
-  h1::before,
-  h1::after {
-    content: none !important;
-  }
-
-  h1 > *::before,
-  h1 > *::after {
-    content: none !important;
+    font-size: clamp(3rem, 5vw, 5rem);
+    line-height: 0.96;
   }
 
   h2 {
-    font-size: 28px;
-    line-height: 34px;
-    margin-top: 20px;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.02;
   }
 
   h3 {
-    font-size: 24px;
-    line-height: 30px;
-    margin-top: 20px;
+    font-size: clamp(1.65rem, 2vw, 2.25rem);
+    line-height: 1.1;
   }
 
   h4 {
-    font-size: 18px;
-    line-height: 24px;
-    margin-top: 10px;
+    font-size: 1.3rem;
+    line-height: 1.25;
   }
 
   h5 {
-    font-size: 16px;
-    line-height: 22px;
-    margin-top: 10px;
+    font-size: 1.05rem;
+    line-height: 1.35;
   }
 
   h6 {
-    font-size: 14px;
-    line-height: 20px;
-    margin-top: 10px;
+    font-size: 0.95rem;
+    line-height: 1.4;
   }
 
   p {
     margin-top: 0;
-    margin-bottom: 1.75em;
+    margin-bottom: 1.6em;
   }
 
   blockquote {
-    margin: 2em 0;
-    padding: 0;
-    border: none;
-    font-size: 20px;
-    line-height: 1.6;
-    color: var(--text-secondary);
+    margin: 2.2em 0;
+    padding: 0 0 0 1.35rem;
+    border-left: 2px solid rgba(179, 64, 54, 0.35);
+    color: var(--text-main);
+    font-size: 1.18rem;
     font-style: italic;
-    font-weight: 300;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  @media (min-width: 640px) {
-    blockquote {
-      max-width: 85%;
-    }
+    font-weight: 400;
+    line-height: 1.8;
   }
 
   a {
-    color: var(--text-secondary);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    -webkit-text-decoration-thickness: 1px;
-    text-decoration-color: var(--text-light);
-    text-underline-offset: 3px;
+    color: var(--link);
     background: transparent;
-    border: none;
-    outline: none;
-    box-shadow: none;
+    text-decoration: underline;
+    text-decoration-color: rgba(35, 67, 113, 0.28);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     transition: color 0.2s ease, text-decoration-color 0.2s ease;
   }
 
   a:hover {
-    color: var(--text-main);
-    text-decoration-color: var(--text-secondary);
-    text-decoration-thickness: 1px;
+    color: var(--link-hover);
+    text-decoration-color: rgba(179, 64, 54, 0.4);
   }
 
-  a:focus {
-    outline: 2px solid var(--link);
+  a:focus-visible {
+    outline: 2px solid rgba(35, 67, 113, 0.35);
     outline-offset: 2px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-  }
-
-  /* Remove any link boxes from rehype-autolink-headings */
-  a.anchor {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  a.anchor::before,
-  a.anchor::after {
-    content: none !important;
-  }
-
-  /* Prevent caret/vertical bar from appearing under h1 */
-  article header h1 {
-    caret-color: transparent !important;
-  }
-
-  article header h1:focus,
-  article header h1:focus-visible {
-    outline: none !important;
-    border: none !important;
-  }
-
-  article header h1 * {
-    caret-color: transparent !important;
-  }
-
-  article header h1 *:focus,
-  article header h1 *:focus-visible {
-    outline: none !important;
-    border: none !important;
-  }
-
-  /* Remove any empty spans or anchors that might show caret */
-  article header h1 > span:empty,
-  article header h1 > a:empty {
-    display: none !important;
-  }
-
-  /* Ensure no contenteditable shows caret */
-  article header h1[contenteditable],
-  article header h1 [contenteditable] {
-    caret-color: transparent !important;
-  }
-
-  /* Remove any borders or outlines that could appear as vertical bar */
-  article header h1 {
-    border: none !important;
-    border-left: none !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
   }
 
   figure {
-    margin: 0;
-    margin-bottom: 1.5em;
+    margin: 0 0 1.5em;
   }
 
   figure img {
@@ -266,133 +158,101 @@
 
   figcaption {
     margin-top: 0.75em;
-    text-align: center;
-    font-size: 13px;
     color: var(--text-light);
+    font-size: 0.875rem;
     font-style: italic;
     line-height: 1.5;
+    text-align: center;
   }
 
   ul,
   ol {
-    margin-top: 0px;
+    margin-top: 0;
     margin-bottom: 1.5em;
-    padding-left: 1.5rem;
+    padding-left: 1.4rem;
   }
 
-  @media (min-width: 640px) {
-    ul,
-    ol {
-      padding-left: 40px;
-    }
-  }
-
-  /* Code blocks from rehype-highlight */
   pre {
-    background: var(--bg-soft) !important;
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-    padding: 1em;
-    margin: 1.5em 0;
+    margin: 1.8em 0;
     overflow-x: auto;
+    border: 1px solid var(--border-light);
+    border-radius: 1.25rem;
+    background: rgba(35, 67, 113, 0.06) !important;
+    padding: 1.15rem 1.2rem;
     line-height: 1.6;
   }
 
   code {
-    background: var(--bg-soft);
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 1em;
+    border-radius: 0.45rem;
+    background: rgba(35, 67, 113, 0.06);
+    padding: 0.12rem 0.45rem;
+    font-size: 0.95em;
   }
 
   pre code {
     background: transparent;
     padding: 0;
   }
-}
 
-/* Styles outside @layer base for higher specificity */
-/* Ensure article content has no background box - scoped selector */
-main article,
-main article > *,
-article,
-article > * {
-  background: transparent;
-  background-color: transparent;
-}
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 
-/* Ensure links in article content have no boxes */
-main article a,
-article a {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  display: inline;
-}
-
-/* Content column wrapper - constrain reading width */
-main {
-  max-width: 700px;
-  margin: 0 auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-@media (min-width: 640px) {
-  main {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  time {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
 }
 
-/* Header nav in same content column */
-header nav {
-  max-width: 700px;
-  margin: 0 auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-@media (min-width: 640px) {
-  header nav {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), Georgia, 'Times New Roman', serif;
   }
 }
 
-/* Reduce vertical space under header */
-header {
-  border-bottom: 1px solid var(--border-light);
-  margin-bottom: 0;
-}
+@layer components {
+  .post-body {
+    color: var(--text-main);
+  }
 
-header nav {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
+  .post-body > :last-child {
+    margin-bottom: 0;
+  }
 
-/* Quiet nav links */
-header nav a {
-  color: var(--text-light);
-  font-size: 13px;
-  text-decoration: none;
-}
+  .post-body h2,
+  .post-body h3,
+  .post-body h4 {
+    margin-top: 2.4rem;
+    margin-bottom: 1rem;
+  }
 
-header nav a:hover {
-  color: var(--text-secondary);
-  text-decoration: none;
-}
+  .post-body p,
+  .post-body ul,
+  .post-body ol {
+    color: var(--text-secondary);
+  }
 
-/* Date styling - remove pill, make it metadata */
-time {
-  font-size: 13px;
-  color: var(--text-light);
-  font-weight: 400;
-  margin-top: 0.25em;
-  display: block;
-}/* Softer image edges */
-article img,
-main img {
-  border-radius: 3px;
+  .post-body li + li {
+    margin-top: 0.45rem;
+  }
+
+  .post-body hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .post-body a.anchor {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .post-body a.anchor:hover {
+    color: inherit;
+  }
 }

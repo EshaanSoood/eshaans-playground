@@ -1,6 +1,10 @@
 'use client'
 
-import { useState, FormEvent, useEffect, useRef } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
+import {
+  LISTMONK_PUBLIC_SUBSCRIPTION_URL,
+  buildPublicSubscriptionPayload,
+} from '@/lib/listmonk-public'
 
 interface SubscribeModalProps {
   isOpen: boolean
@@ -14,12 +18,10 @@ export function SubscribeModal({ isOpen, onClose }: SubscribeModalProps) {
   const [honeypot, setHoneypot] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const formRef = useRef<HTMLFormElement>(null)
   const firstNameInputRef = useRef<HTMLInputElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setFirstName('')
@@ -28,30 +30,24 @@ export function SubscribeModal({ isOpen, onClose }: SubscribeModalProps) {
       setHoneypot('')
       setMessage(null)
       setIsSubmitting(false)
-      // Focus first input when modal opens
       setTimeout(() => firstNameInputRef.current?.focus(), 100)
-    } else {
-      // Clear any pending timeouts when modal closes
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current)
-        closeTimeoutRef.current = null
-      }
+    } else if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
     }
   }, [isOpen])
 
-  // Handle escape key to close modal and trap focus
   useEffect(() => {
     if (!isOpen) return
 
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isSubmitting) {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isSubmitting) {
         onClose()
       }
     }
 
-    // Focus trap: keep focus within modal
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab' || !modalRef.current) return
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !modalRef.current) return
 
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -59,37 +55,36 @@ export function SubscribeModal({ isOpen, onClose }: SubscribeModalProps) {
       const firstElement = focusableElements[0]
       const lastElement = focusableElements[focusableElements.length - 1]
 
-      if (e.shiftKey) {
+      if (event.shiftKey) {
         if (document.activeElement === firstElement) {
-          e.preventDefault()
+          event.preventDefault()
           lastElement?.focus()
         }
-      } else {
-        if (document.activeElement === lastElement) {
-          e.preventDefault()
-          firstElement?.focus()
-        }
+      } else if (document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement?.focus()
       }
     }
 
     document.addEventListener('keydown', handleEscape)
     document.addEventListener('keydown', handleTab)
+
     return () => {
       document.removeEventListener('keydown', handleEscape)
       document.removeEventListener('keydown', handleTab)
     }
-  }, [isOpen, onClose, isSubmitting])
+  }, [isOpen, isSubmitting, onClose])
 
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
+
     return () => {
       document.body.style.overflow = ''
-      // Cleanup timeout on unmount
+
       if (closeTimeoutRef.current) {
         clearTimeout(closeTimeoutRef.current)
         closeTimeoutRef.current = null
@@ -97,43 +92,42 @@ export function SubscribeModal({ isOpen, onClose }: SubscribeModalProps) {
     }
   }, [isOpen])
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (honeypot.trim()) {
+      onClose()
+      return
+    }
+
     setIsSubmitting(true)
     setMessage(null)
 
     try {
-      const response = await fetch('/api/subscribers/subscribe', {
+      const response = await fetch(LISTMONK_PUBLIC_SUBSCRIPTION_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          email: email.trim(),
-          honeypot: honeypot.trim(),
-        }),
+        body: JSON.stringify(buildPublicSubscriptionPayload({ firstName, lastName, email })),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => null)
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to subscribe')
+        throw new Error(data?.message || 'Failed to subscribe')
       }
 
       setMessage({
         type: 'success',
-        text: data.message || 'Thank you for subscribing!',
+        text: 'Success. Check your email to confirm your subscription.',
       })
 
-      // Reset form on success
       setFirstName('')
       setLastName('')
       setEmail('')
       setHoneypot('')
 
-      // Close modal after 2 seconds on success
       closeTimeoutRef.current = setTimeout(() => {
         onClose()
         closeTimeoutRef.current = null
@@ -152,183 +146,138 @@ export function SubscribeModal({ isOpen, onClose }: SubscribeModalProps) {
 
   return (
     <div
+      id="subscribe-modal"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={(e) => {
-        // Close when clicking backdrop (but not when submitting)
-        if (e.target === e.currentTarget && !isSubmitting) {
+      onClick={(event) => {
+        if (event.target === event.currentTarget && !isSubmitting) {
           onClose()
         }
       }}
-      style={{
-        backgroundColor: 'rgba(31, 42, 51, 0.5)',
-      }}
+      style={{ backgroundColor: 'rgba(21, 39, 66, 0.42)' }}
       aria-modal="true"
       role="dialog"
       aria-labelledby="subscribe-modal-title"
     >
       <div
         ref={modalRef}
-        className="relative w-full max-w-md rounded border p-6 shadow-lg"
-        style={{
-          backgroundColor: 'var(--bg-card)',
-          borderColor: 'var(--border-light)',
-        }}
-        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-xl rounded-[2rem] border border-white/60 bg-[#fff8f1] p-6 shadow-paper-strong sm:p-8"
+        onClick={(event) => event.stopPropagation()}
       >
         <button
           onClick={onClose}
           disabled={isSubmitting}
-          className="absolute right-4 top-4 text-xl leading-none hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded"
+          className="absolute right-4 top-4 rounded-full border border-blue-deep/10 bg-white/80 px-3 py-2 text-lg leading-none text-text-light transition hover:text-text-main focus:outline-none focus:ring-2 focus:ring-blue-deep/20 focus:ring-offset-2"
           aria-label="Close modal"
-          style={{
-            color: 'var(--text-light)',
-            transition: 'opacity 0.2s ease',
-          }}
         >
-          ×
+          &times;
         </button>
 
-        <h2
-          id="subscribe-modal-title"
-          className="mb-4 text-2xl"
-          style={{
-            color: 'var(--text-main)',
-          }}
-        >
-          Subscribe
-        </h2>
+        <div className="mb-6 flex flex-col gap-3 pr-12">
+          <span className="w-fit rounded-full border border-orange-main/20 bg-orange-soft/40 px-3 py-1 text-xs uppercase tracking-[0.22em] text-orange-deep">
+            Newsletter
+          </span>
+          <h2 id="subscribe-modal-title" className="mb-0 text-4xl sm:text-[2.85rem]">
+            Stay close to the work.
+          </h2>
+          <p className="m-0 text-base leading-8 text-text-secondary">
+            Sign up for new posts, experiments, and the occasional useful tangent. This list uses
+            double opt-in, so you&apos;ll confirm by email before anything starts arriving.
+          </p>
+        </div>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Honeypot field - invisible to users */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             name="website"
             value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
+            onChange={(event) => setHoneypot(event.target.value)}
             tabIndex={-1}
             autoComplete="off"
             aria-hidden="true"
-            style={{
-              position: 'absolute',
-              left: '-9999px',
-              opacity: 0,
-              pointerEvents: 'none',
-            }}
+            className="pointer-events-none absolute left-[-9999px] opacity-0"
           />
 
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="firstName"
-              className="text-sm"
-              style={{
-                color: 'var(--text-secondary)',
-              }}
-            >
-              First Name <span style={{ color: 'var(--accent)' }}>*</span>
-            </label>
-            <input
-              ref={firstNameInputRef}
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              disabled={isSubmitting}
-              className="rounded border px-3 py-2"
-              style={{
-                backgroundColor: 'var(--bg-main)',
-                borderColor: 'var(--border-light)',
-                color: 'var(--text-main)',
-              }}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="firstName" className="text-sm font-medium text-text-secondary">
+                First Name <span className="text-orange-main">*</span>
+              </label>
+              <input
+                ref={firstNameInputRef}
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                required
+                disabled={isSubmitting}
+                className="rounded-2xl border border-border-light bg-white/80 px-4 py-3 text-text-main shadow-sm outline-none transition placeholder:text-text-light/70 focus:border-blue-deep/35 focus:ring-4 focus:ring-blue-deep/10"
+                placeholder="Eshaan"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="lastName" className="text-sm font-medium text-text-secondary">
+                Last Name <span className="text-orange-main">*</span>
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                required
+                disabled={isSubmitting}
+                className="rounded-2xl border border-border-light bg-white/80 px-4 py-3 text-text-main shadow-sm outline-none transition placeholder:text-text-light/70 focus:border-blue-deep/35 focus:ring-4 focus:ring-blue-deep/10"
+                placeholder="Sood"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label
-              htmlFor="lastName"
-              className="text-sm"
-              style={{
-                color: 'var(--text-secondary)',
-              }}
-            >
-              Last Name <span style={{ color: 'var(--accent)' }}>*</span>
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              disabled={isSubmitting}
-              className="rounded border px-3 py-2"
-              style={{
-                backgroundColor: 'var(--bg-main)',
-                borderColor: 'var(--border-light)',
-                color: 'var(--text-main)',
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="email"
-              className="text-sm"
-              style={{
-                color: 'var(--text-secondary)',
-              }}
-            >
-              Email <span style={{ color: 'var(--accent)' }}>*</span>
+            <label htmlFor="email" className="text-sm font-medium text-text-secondary">
+              Email <span className="text-orange-main">*</span>
             </label>
             <input
               type="email"
               id="email"
               name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               disabled={isSubmitting}
-              className="rounded border px-3 py-2"
-              style={{
-                backgroundColor: 'var(--bg-main)',
-                borderColor: 'var(--border-light)',
-                color: 'var(--text-main)',
-              }}
+              className="rounded-2xl border border-border-light bg-white/80 px-4 py-3 text-text-main shadow-sm outline-none transition placeholder:text-text-light/70 focus:border-blue-deep/35 focus:ring-4 focus:ring-blue-deep/10"
+              placeholder="you@example.com"
             />
           </div>
 
-          {message && (
+          {message ? (
             <div
               role="alert"
               aria-live={message.type === 'error' ? 'assertive' : 'polite'}
-              className="rounded px-3 py-2 text-sm"
-              style={{
-                backgroundColor:
-                  message.type === 'success'
-                    ? 'var(--bg-soft)'
-                    : 'var(--orange-soft)',
-                color:
-                  message.type === 'success'
-                    ? 'var(--text-secondary)'
-                    : 'var(--orange-deep)',
-              }}
+              className={[
+                'rounded-2xl border px-4 py-3 text-sm',
+                message.type === 'success'
+                  ? 'border-blue-deep/15 bg-blue-soft/20 text-text-secondary'
+                  : 'border-orange-main/20 bg-orange-soft/35 text-orange-deep',
+              ].join(' ')}
             >
               {message.text}
             </div>
-          )}
+          ) : null}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 rounded px-4 py-2 font-medium transition-opacity disabled:opacity-50"
-            style={{
-              backgroundColor: 'var(--accent)',
-              color: '#FFFFFF',
-            }}
-          >
-            {isSubmitting ? 'Subscribing...' : 'Subscribe'}
-          </button>
+          <div className="flex flex-col gap-3 border-t border-border-light/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="m-0 text-sm leading-7 text-text-light">
+              Managed through Listmonk. One click to join, one email to confirm.
+            </p>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center justify-center rounded-full border border-orange-main bg-orange-main px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-orange-deep disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSubmitting ? 'Subscribing...' : 'Subscribe'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

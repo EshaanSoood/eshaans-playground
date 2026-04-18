@@ -1,5 +1,5 @@
 /**
- * Script to create a post in Convex from an MDX file and automatically send emails
+ * Script to create a post in the external Payload CMS from an MDX file and automatically send emails
  * 
  * Usage:
  *   npx tsx scripts/create-post-from-mdx.ts <slug> [--no-email]

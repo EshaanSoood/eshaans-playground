@@ -8,8 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import { unsubscribeEmailFromBlogList } from "@/lib/listmonk-server";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,38 +36,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Convex URL
-    const convexUrl = process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL;
-    if (!convexUrl) {
-      return NextResponse.json(
-        { error: "Server configuration error: CONVEX_URL not set" },
-        { status: 500 }
-      );
-    }
-
-    const convex = new ConvexHttpClient(convexUrl);
-
-    // Unsubscribe the user
-    const subscriberId = await convex.mutation(api.subscribers.unsubscribe, {
-      email: trimmedEmail,
-    });
-
-    if (subscriberId === null) {
-      // Subscriber not found - but we'll still return success to prevent email enumeration
-      return NextResponse.json(
-        {
-          success: true,
-          message: "You've been unsubscribed successfully.",
-        },
-        { status: 200 }
-      );
-    }
+    await unsubscribeEmailFromBlogList(trimmedEmail);
 
     return NextResponse.json(
       {
         success: true,
         message: "You've been unsubscribed successfully.",
-        subscriberId,
       },
       { status: 200 }
     );

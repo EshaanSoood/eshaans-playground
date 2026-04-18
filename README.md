@@ -6,9 +6,9 @@ A personal blog built with Next.js, deployed on Vercel.
 
 - **Framework**: Next.js 16 (App Router)
 - **Styling**: Tailwind CSS
-- **Content**: MDX with Convex backend
+- **Content**: MDX rendered from an external Payload CMS
 - **Deployment**: Vercel
-- **Database**: Convex
+- **Database**: Postgres via sibling `cms/` Payload app
 
 ## Development
 
@@ -16,7 +16,7 @@ A personal blog built with Next.js, deployed on Vercel.
 
 - Node.js 18+ 
 - npm or yarn
-- Convex account (for content management)
+- Access to the sibling `cms/` project
 
 ### Setup
 
@@ -33,8 +33,9 @@ npm install
 
 3. Set up environment variables:
 ```bash
-# Create .env file
-CONVEX_URL=your_convex_url_here
+# Create .env.local
+PAYLOAD_CMS_URL=http://127.0.0.1:3001
+CMS_WEBHOOK_SECRET=shared-secret-with-cms
 PUBLIC_MAIN_SITE_URL=https://eshaansood.in
 ```
 
@@ -66,8 +67,8 @@ The built site will be in the `.next/` directory.
 1. Connect your repository to Vercel
 2. Vercel will auto-detect Next.js and configure build settings
 3. Add environment variables:
-   - `NEXT_PUBLIC_CONVEX_URL`: Your Convex deployment URL
-   - `CONVEX_URL`: Your Convex deployment URL (for server-side)
+   - `PAYLOAD_CMS_URL`: Base URL of the deployed Payload CMS
+   - `CMS_WEBHOOK_SECRET`: Shared secret that allows this repo to sync content into the CMS
    - `PUBLIC_MAIN_SITE_URL`: Your main site URL (optional)
 
 ### Custom Domain
@@ -87,7 +88,6 @@ The built site will be in the `.next/` directory.
 ├── components/         # React components
 ├── lib/                # Utilities and helpers
 ├── public/             # Static assets
-├── convex/             # Convex functions
 └── styles/             # Global styles
 ```
 
@@ -100,7 +100,7 @@ The built site will be in the `.next/` directory.
 
 ## Content Management
 
-Posts are managed through Convex. The site queries Convex at build time to generate static pages.
+Posts are managed in the sibling `cms/` Payload repo. This site reads published posts from the Payload REST API and uses the shared webhook secret for post sync and email-sent bookkeeping.
 
 ## License
 
