@@ -8,6 +8,7 @@ import rehypeSlug from 'rehype-slug'
 import { getPostBySlug } from '@/lib/content'
 import { formatPostDate, getReadingTimeLabel } from '@/lib/post-display'
 import { MAIN_SITE_LINKS } from '@/lib/links'
+import { mdxComponents } from '@/lib/mdx-components'
 
 interface PostPageProps {
   params:
@@ -95,6 +96,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="post-body pt-8">
           <MDXRemote
             source={post.content}
+            components={mdxComponents}
             options={{
               mdxOptions: {
                 rehypePlugins: [
